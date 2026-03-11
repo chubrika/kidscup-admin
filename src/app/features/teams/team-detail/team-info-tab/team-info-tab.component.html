@@ -1,0 +1,17 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Team Information</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <dl class="info-list">
+      <dt>Name</dt><dd>{{ team().name }}</dd>
+      <dt>City</dt><dd>{{ team().city }}</dd>
+      <dt>Coach</dt><dd>{{ team().coachName }}</dd>
+      <dt>Age Category</dt><dd>{{ team().ageCategory }}</dd>
+      @if (team().logo) {
+        <dt>Logo</dt>
+        <dd><img [src]="team().logo" alt="Logo" class="logo" /></dd>
+      }
+    </dl>
+  </mat-card-content>
+</mat-card>

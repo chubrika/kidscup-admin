@@ -1,1 +1,38 @@
-.
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.angular/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.tmp
+.temp
+.cache
+
+# Test and coverage
+coverage/
+.nyc_output/
+
+# Optional
+*.tsbuildinfo

@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ data ? 'Edit Category' : 'New Category' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. U12" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Min Age</mat-label>
+      <input matInput type="number" formControlName="minAge" min="0" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Max Age</mat-label>
+      <input matInput type="number" formControlName="maxAge" min="0" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" />
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+  </mat-dialog-actions>
+</form>

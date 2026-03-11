@@ -1,0 +1,25 @@
+@if (player()) {
+  <div class="header">
+    <button mat-icon-button (click)="router.navigate(['/players'])">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="page-title">{{ player()!.firstName }} {{ player()!.lastName }}</h1>
+    <button mat-flat-button color="primary" (click)="openEditDialog()">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </button>
+  </div>
+  <mat-card>
+    <mat-card-content>
+      <dl class="info-list">
+        <dt>Number</dt><dd>{{ player()!.number }}</dd>
+        <dt>Position</dt><dd>{{ player()!.position }}</dd>
+        <dt>Birth Date</dt><dd>{{ player()!.birthDate }}</dd>
+        <dt>Height</dt><dd>{{ player()!.height ? player()!.height + ' cm' : '-' }}</dd>
+        <dt>Team</dt><dd><a [routerLink]="['/teams', player()!.teamId]">{{ player()!.teamName ?? '-' }}</a></dd>
+      </dl>
+    </mat-card-content>
+  </mat-card>
+} @else {
+  <p>Loading...</p>
+}

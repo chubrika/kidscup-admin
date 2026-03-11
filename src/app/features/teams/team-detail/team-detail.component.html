@@ -1,0 +1,25 @@
+@if (team()) {
+  <div class="header">
+    <button mat-icon-button (click)="router.navigate(['/teams'])">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="page-title">{{ team()!.name }}</h1>
+    <button mat-flat-button color="primary" (click)="openEditDialog()">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </button>
+  </div>
+  <mat-tab-group>
+    <mat-tab label="Team Info">
+      <app-team-info-tab [team]="team()!" />
+    </mat-tab>
+    <mat-tab label="Players">
+      <app-team-players-tab [teamId]="teamId()" />
+    </mat-tab>
+    <mat-tab label="Matches">
+      <app-team-matches-tab [teamId]="teamId()" />
+    </mat-tab>
+  </mat-tab-group>
+} @else {
+  <p>Loading...</p>
+}

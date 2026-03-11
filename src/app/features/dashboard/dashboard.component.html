@@ -1,0 +1,47 @@
+<h1 class="page-title">Dashboard</h1>
+<div class="stats-grid">
+  <mat-card class="stat-card">
+    <mat-card-content>
+      <div class="stat-icon teams">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats()?.totalTeams ?? '-' }}</span>
+        <span class="stat-label">Total Teams</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="stat-card">
+    <mat-card-content>
+      <div class="stat-icon players">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats()?.totalPlayers ?? '-' }}</span>
+        <span class="stat-label">Total Players</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="stat-card">
+    <mat-card-content>
+      <div class="stat-icon upcoming">
+        <mat-icon>event</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats()?.upcomingMatches ?? '-' }}</span>
+        <span class="stat-label">Upcoming Matches</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="stat-card">
+    <mat-card-content>
+      <div class="stat-icon finished">
+        <mat-icon>sports_score</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats()?.finishedMatches ?? '-' }}</span>
+        <span class="stat-label">Finished Matches</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
