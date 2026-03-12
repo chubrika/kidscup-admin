@@ -61,7 +61,7 @@ export class MatchDetailComponent implements OnInit {
     const m = this.match();
     if (!m) return;
     const v = this.scoreForm.getRawValue();
-    this.matchesService.update(m.id, { scoreHome: v.scoreHome, scoreAway: v.scoreAway }).subscribe((updated) => {
+    this.matchesService.update(m._id, { scoreHome: v.scoreHome, scoreAway: v.scoreAway }).subscribe((updated) => {
       this.match.set(updated);
     });
   }

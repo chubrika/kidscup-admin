@@ -44,7 +44,7 @@ export class TeamFormDialogComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.categoriesService.getCategories().subscribe((list) => {
+    this.categoriesService.getAll().subscribe((list) => {
       this.categories = list;
       const current = this.form.get('ageCategory')?.value;
       if ((current === '' || current == null) && list.length > 0) {

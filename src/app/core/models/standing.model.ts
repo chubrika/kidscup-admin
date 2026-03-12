@@ -1,4 +1,12 @@
 export interface StandingRow {
+  _id: string;
+  categoryId: string; 
+  categoryName: string;
+  standings: TeamStanding[];
+}
+
+export interface TeamStanding {
+  _id: string;
   teamId: string;
   teamName: string;
   teamLogo?: string;
@@ -8,5 +16,4 @@ export interface StandingRow {
   points: number;
   pointsFor: number;
   pointsAgainst: number;
-  ageCategory: string;
 }

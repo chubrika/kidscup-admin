@@ -13,10 +13,7 @@ export class StandingsService {
     return this.api.get<StandingRow[]>('/standings', params).pipe(
       delay(200),
       catchError(() =>
-        of([
-          { teamId: '1', teamName: 'Eagles', played: 5, wins: 4, losses: 1, points: 12, pointsFor: 320, pointsAgainst: 280, ageCategory: 'U12' },
-          { teamId: '2', teamName: 'Tigers', played: 5, wins: 3, losses: 2, points: 9, pointsFor: 300, pointsAgainst: 290, ageCategory: 'U12' },
-        ]),
+        of(),
       ),
     );
   }

@@ -5,6 +5,7 @@ export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'can
 
 export interface Match {
   id: string;
+  _id: string;
   homeTeamId: string;
   awayTeamId: string;
   homeTeam?: Team;

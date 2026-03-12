@@ -59,7 +59,7 @@ export class MatchFormDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.teamsService.getAll().subscribe((t) => this.teams.set(t));
-    this.categoriesService.getCategories().subscribe((c) => this.categories.set(c));
+    this.categoriesService.getAll().subscribe((c) => this.categories.set(c));
   }
 
   teamId(team: Team): string {
