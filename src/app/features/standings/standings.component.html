@@ -5,8 +5,8 @@
       <mat-label>Age Category</mat-label>
       <mat-select [ngModel]="selectedCategory()" (ngModelChange)="onCategoryChange($event)">
         <mat-option value="">All</mat-option>
-        @for (cat of categories(); track cat.id) {
-          <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+        @for (cat of categories(); track cat._id) {
+          <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
