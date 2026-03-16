@@ -38,13 +38,13 @@ export class CategoryFormDialogComponent {
   submit(): void {
     if (this.form.invalid) return;
     const v = this.form.getRawValue();
-    const dto: AgeCategoryCreateDto & { id?: string } = {
+    const dto: AgeCategoryCreateDto & { _id?: string } = {
       name: v.name,
       minAge: v.minAge ?? undefined,
       maxAge: v.maxAge ?? undefined,
       description: v.description || undefined,
     };
-    if (this.data?.id) dto.id = this.data.id;
+    if (this.data?._id) dto._id = this.data._id;
     this.ref.close(dto);
   }
 }

@@ -1,29 +1,29 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Teams</mat-card-title>
+    <mat-card-title>გუნდი</mat-card-title>
     <button mat-flat-button color="primary" (click)="openCreateDialog()">
       <mat-icon>add</mat-icon>
-      Add Team
+      გუნდის დამატება
     </button>
   </mat-card-header>
   <mat-card-content>
     <table mat-table [dataSource]="dataSource" class="teams-table">
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <th mat-header-cell *matHeaderCellDef>დასახელება</th>
         <td mat-cell *matCellDef="let row">
           <a [routerLink]="['/teams', row.id]">{{ row.name }}</a>
         </td>
       </ng-container>
       <ng-container matColumnDef="city">
-        <th mat-header-cell *matHeaderCellDef>City</th>
+        <th mat-header-cell *matHeaderCellDef>ქალაქი</th>
         <td mat-cell *matCellDef="let row">{{ row.city }}</td>
       </ng-container>
       <ng-container matColumnDef="coachName">
-        <th mat-header-cell *matHeaderCellDef>Coach</th>
+        <th mat-header-cell *matHeaderCellDef>მწვრთნელი</th>
         <td mat-cell *matCellDef="let row">{{ row.coachName }}</td>
       </ng-container>
       <ng-container matColumnDef="ageCategory">
-        <th mat-header-cell *matHeaderCellDef>Category</th>
+        <th mat-header-cell *matHeaderCellDef>ჩემპიონატი</th>
         <td mat-cell *matCellDef="let row">{{ row.ageCategory?.name ?? row.ageCategory }}</td>
       </ng-container>
       <ng-container matColumnDef="actions">

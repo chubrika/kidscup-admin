@@ -51,7 +51,7 @@ export class PlayersListComponent implements OnInit {
       data: { title: 'Delete Player', message: `Delete ${player.firstName} ${player.lastName}?` },
     });
     ref.afterClosed().subscribe((ok) => {
-      if (ok) this.playersService.delete(player.id).subscribe(() => this.refresh());
+      if (ok) this.playersService.delete(player._id).subscribe(() => this.refresh());
     });
   }
 

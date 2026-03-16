@@ -6,18 +6,18 @@
     <h1 class="page-title">{{ team()!.name }}</h1>
     <button mat-flat-button color="primary" (click)="openEditDialog()">
       <mat-icon>edit</mat-icon>
-      Edit
+     გუნდის რედაქტირება
     </button>
   </div>
   <mat-tab-group>
-    <mat-tab label="Team Info">
+    <mat-tab label="გუნდი">
       <app-team-info-tab [team]="team()!" />
     </mat-tab>
-    <mat-tab label="Players">
-      <app-team-players-tab [teamId]="teamId()" />
+    <mat-tab label="მოთამაშეები">
+      <app-team-players-tab [teamId]="teamId()!" />
     </mat-tab>
-    <mat-tab label="Matches">
-      <app-team-matches-tab [teamId]="teamId()" />
+    <mat-tab label="თამაშები">
+      <app-team-matches-tab [teamId]="teamId()!" />
     </mat-tab>
   </mat-tab-group>
 } @else {

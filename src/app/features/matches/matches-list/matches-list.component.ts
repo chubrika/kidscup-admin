@@ -49,7 +49,7 @@ export class MatchesListComponent implements OnInit {
       data: { title: 'Delete Match', message: 'Delete this match?' },
     });
     ref.afterClosed().subscribe((ok) => {
-      if (ok) this.matchesService.delete(match.id).subscribe(() => this.refresh());
+      if (ok) this.matchesService.delete(match._id).subscribe(() => this.refresh());
     });
   }
 

@@ -26,7 +26,7 @@ export class TeamsService {
     return this.api.post<Team>('/teams', dto).pipe(
       delay(200),
       catchError(() =>
-        of({ _id: String(Date.now()), ...dto } as Team),
+        of({ _id: String(Date.now()), ageCategory: { _id: '', name: '' }, ...dto } as Team),
       ),
     );
   }
@@ -34,7 +34,7 @@ export class TeamsService {
   update(id: string, dto: Partial<TeamCreateDto>): Observable<Team> {
     return this.api.patch<Team>(`/teams/${id}`, dto).pipe(
       delay(200),
-      catchError(() => of({ _id: id, ...dto } as unknown as Team)),
+      catchError(() => of({ _id: id, ageCategory: { _id: '', name: '' }, ...dto } as unknown as Team)),
     );
   }
 

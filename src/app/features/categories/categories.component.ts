@@ -33,7 +33,7 @@ export class CategoriesComponent implements OnInit {
     const ref = this.dialog.open(CategoryFormDialogComponent, { width: '400px', data: null });
     ref.afterClosed().subscribe((result) => {
       if (result) {
-        if (result.id) {
+        if (result._id) {
           this.categoriesService.update(result.id, result).subscribe(() => this.refresh());
         } else {
           this.categoriesService.create(result).subscribe(() => this.refresh());
@@ -54,7 +54,7 @@ export class CategoriesComponent implements OnInit {
       data: { title: 'Delete Category', message: `Delete "${cat.name}"?` },
     });
     ref.afterClosed().subscribe((ok) => {
-      if (ok) this.categoriesService.delete(cat.id).subscribe(() => this.refresh());
+      if (ok) this.categoriesService.delete(cat._id).subscribe(() => this.refresh());
     });
   }
 

@@ -12,7 +12,7 @@
         <span class="score">{{ match()!.scoreHome ?? 0 }} : {{ match()!.scoreAway ?? 0 }}</span>
         <span class="team">{{ match()!.awayTeam?.name }}</span>
       </div>
-      <p class="meta">{{ match()!.date }} {{ match()!.time }} · {{ match()!.location }} · {{ match()!.ageCategory?.name }}</p>
+      <p class="meta">{{ match()!.date }} {{ match()!.time }} · {{ match()!.location }} </p>
       <p class="status">Status: {{ match()!.status }}</p>
     </mat-card-content>
   </mat-card>

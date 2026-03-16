@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>{{ data ? 'Edit Match' : 'New Match' }}</h2>
+<h2 mat-dialog-title>{{ data ? 'თამაშის რედაქტირება' : 'ახალი თამაში' }}</h2>
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline">
-      <mat-label>Home Team</mat-label>
+      <mat-label>Home </mat-label>
       <mat-select formControlName="homeTeamId">
         @for (t of teams(); track teamId(t)) {
           <mat-option [value]="teamId(t)">{{ t.name }}</mat-option>
@@ -10,7 +10,7 @@
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Away Team</mat-label>
+      <mat-label>Away </mat-label>
       <mat-select formControlName="awayTeamId">
         @for (t of teams(); track teamId(t)) {
           <mat-option [value]="teamId(t)">{{ t.name }}</mat-option>
@@ -18,33 +18,33 @@
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Date</mat-label>
+      <mat-label>თარიღი</mat-label>
       <input matInput type="date" formControlName="date" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Time</mat-label>
+      <mat-label>დრო</mat-label>
       <input matInput type="time" formControlName="time" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Location</mat-label>
+      <mat-label>მდებარეობა</mat-label>
       <input matInput formControlName="location" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Age Category</mat-label>
+      <mat-label>ჩემპიონატი</mat-label>
       <mat-select formControlName="ageCategory">
-        @for (cat of categories(); track cat.id) {
-          <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+        @for (cat of categories(); track cat._id) {
+          <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Status</mat-label>
       <mat-select formControlName="status">
-        <mat-option value="scheduled">Scheduled</mat-option>
+        <mat-option value="scheduled">დაგეგმილი</mat-option>
         <mat-option value="live">Live</mat-option>
-        <mat-option value="finished">Finished</mat-option>
-        <mat-option value="postponed">Postponed</mat-option>
-        <mat-option value="cancelled">Cancelled</mat-option>
+        <mat-option value="finished">დასრულებული</mat-option>
+        <mat-option value="postponed">გადატოვებული</mat-option>
+        <mat-option value="cancelled">გაუქმებული</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline">
@@ -57,7 +57,7 @@
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" mat-dialog-close>Cancel</button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">შენახვა</button>
   </mat-dialog-actions>
 </form>

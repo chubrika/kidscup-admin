@@ -2,11 +2,11 @@
   <mat-card-content>
     <table mat-table [dataSource]="matches()" class="full-width">
       <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <th mat-header-cell *matHeaderCellDef>თარიღი</th>
         <td mat-cell *matCellDef="let row">{{ row.date }} {{ row.time }}</td>
       </ng-container>
       <ng-container matColumnDef="match">
-        <th mat-header-cell *matHeaderCellDef>Match</th>
+        <th mat-header-cell *matHeaderCellDef>თამაში</th>
         <td mat-cell *matCellDef="let row">
           <a [routerLink]="['/matches', row.id]">
             {{ row.homeTeamName }} vs {{ row.awayTeamName }}
@@ -14,7 +14,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="score">
-        <th mat-header-cell *matHeaderCellDef>Score</th>
+        <th mat-header-cell *matHeaderCellDef>ქულა</th>
         <td mat-cell *matCellDef="let row">{{ row.scoreHome ?? '-' }} : {{ row.scoreAway ?? '-' }}</td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

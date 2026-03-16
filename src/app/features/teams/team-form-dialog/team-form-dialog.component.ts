@@ -48,7 +48,7 @@ export class TeamFormDialogComponent implements OnInit {
       this.categories = list;
       const current = this.form.get('ageCategory')?.value;
       if ((current === '' || current == null) && list.length > 0) {
-        this.form.patchValue({ ageCategory: list[0].id });
+        this.form.patchValue({ ageCategory: list[0]._id });
       }
     });
   }

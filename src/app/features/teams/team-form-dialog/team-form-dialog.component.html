@@ -1,23 +1,23 @@
-<h2 mat-dialog-title>{{ data ? 'Edit Team' : 'New Team' }}</h2>
+<h2 mat-dialog-title>{{ data ? 'გუნდის რედაქტირება' : 'ახალი გუნდი' }}</h2>
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline">
-      <mat-label>Name</mat-label>
+      <mat-label>დასახელება</mat-label>
       <input matInput formControlName="name" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>City</mat-label>
+      <mat-label>ქალაქი</mat-label>
       <input matInput formControlName="city" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Coach Name</mat-label>
+      <mat-label>მწვრთნელის სახელი</mat-label>
       <input matInput formControlName="coachName" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Age Category</mat-label>
+      <mat-label>ჩემპიონატი</mat-label>
       <mat-select formControlName="ageCategory">
-        @for (cat of categories; track cat.id) {
-          <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+        @for (cat of categories; track cat._id) {
+          <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -27,7 +27,7 @@
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" mat-dialog-close>Cancel</button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">შენახვა</button>
   </mat-dialog-actions>
 </form>

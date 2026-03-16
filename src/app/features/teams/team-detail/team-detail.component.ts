@@ -1,9 +1,9 @@
-import { Component, inject, signal, OnInit, input } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TeamsService } from '../teams.service';
 import { Team } from '../../../core/models/team.model';
 import { TeamFormDialogComponent } from '../team-form-dialog/team-form-dialog.component';
@@ -36,14 +36,22 @@ import { TeamMatchesTabComponent } from './team-matches-tab/team-matches-tab.com
   `],
 })
 export class TeamDetailComponent implements OnInit {
-  readonly teamId = input.required<string>();
+  private readonly route = inject(ActivatedRoute);
   private readonly teamsService = inject(TeamsService);
   private readonly dialog = inject(MatDialog);
   readonly router = inject(Router);
+  readonly teamId = signal<string | undefined>(undefined);
   readonly team = signal<Team | null>(null);
 
   ngOnInit(): void {
-    this.teamsService.getById(this.teamId()).subscribe((t) => this.team.set(t ?? null));
+    // Prefer current route param, fallback to parent (e.g. when using loadChildren)
+    const id =
+      this.route.snapshot.paramMap.get('id') ??
+      this.route.parent?.snapshot.paramMap.get('id') ??
+      undefined;
+    this.teamId.set(id);
+    if (!id) return;
+    this.teamsService.getById(id).subscribe((t) => this.team.set(t ?? null));
   }
 
   openEditDialog(): void {

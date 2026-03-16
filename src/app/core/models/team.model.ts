@@ -5,7 +5,7 @@ export interface Team {
   city: string;
   coachName: string;
   /** Category ID (string) or populated category object from API */
-  ageCategory: string | { _id: string; name?: string };
+  ageCategory: { _id: string; name?: string };
   createdAt?: string;
   updatedAt?: string;
 }

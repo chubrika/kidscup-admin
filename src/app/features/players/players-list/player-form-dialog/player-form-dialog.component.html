@@ -1,32 +1,39 @@
-<h2 mat-dialog-title>{{ data ? 'Edit Player' : 'New Player' }}</h2>
+<h2 mat-dialog-title>{{ data ? 'მოთამაშის რედაქტირება' : 'ახალი მოთამაშე' }}</h2>
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline">
-      <mat-label>First Name</mat-label>
+      <mat-label>სახელი</mat-label>
       <input matInput formControlName="firstName" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Last Name</mat-label>
+      <mat-label>გვარი</mat-label>
       <input matInput formControlName="lastName" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Number</mat-label>
+      <mat-label>ნომერი</mat-label>
       <input matInput type="number" formControlName="number" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Position</mat-label>
-      <input matInput formControlName="position" placeholder="e.g. Guard, Forward" />
+      <mat-label>პოზიცია</mat-label>
+      <mat-select formControlName="position" placeholder="Select position">
+        @for (p of positions; track p.code) {
+          <mat-option [value]="p.code">{{ p.code }} — {{ p.label }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('position')?.invalid && form.get('position')?.touched) {
+        <mat-error>Position is required</mat-error>
+      }
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Birth Date</mat-label>
+      <mat-label>დაბადების თარიღი</mat-label>
       <input matInput type="date" formControlName="birthDate" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Height (cm)</mat-label>
+      <mat-label>სიმაღლე (სმ)</mat-label>
       <input matInput type="number" formControlName="height" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Team</mat-label>
+      <mat-label>გუნდი</mat-label>
       <mat-select formControlName="teamId">
         @for (t of teams(); track t._id) {
           <mat-option [value]="t._id">{{ t.name }}</mat-option>
@@ -34,12 +41,12 @@
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Photo URL</mat-label>
+      <mat-label>ფოტოს URL</mat-label>
       <input matInput formControlName="photo" placeholder="https://..." />
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" mat-dialog-close>Cancel</button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">შენახვა</button>
   </mat-dialog-actions>
 </form>

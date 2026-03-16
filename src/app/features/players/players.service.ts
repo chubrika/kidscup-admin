@@ -32,14 +32,14 @@ export class PlayersService {
   create(dto: PlayerCreateDto): Observable<Player> {
     return this.api.post<Player>('/players', dto).pipe(
       delay(200),
-      catchError(() => of({ id: String(Date.now()), ...dto } as Player)),
+      catchError(() => of({ _id: String(Date.now()), ...dto } as unknown as Player)),
     );
   }
 
   update(id: string, dto: Partial<PlayerCreateDto>): Observable<Player> {
     return this.api.patch<Player>(`/players/${id}`, dto).pipe(
       delay(200),
-      catchError(() => of({ id, ...dto } as Player)),
+      catchError(() => of({ _id: id, ...dto } as unknown as Player)),
     );
   }
 

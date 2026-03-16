@@ -10,6 +10,15 @@ import { Player, PlayerCreateDto } from '@app/core/models/player.model';
 import { TeamsService } from '@app/features/teams/teams.service';
 import { Team } from '@app/core/models/team.model';
 
+/** Basketball positions: short code stored in DB, label shown in UI */
+export const PLAYER_POSITIONS: { code: string; label: string }[] = [
+  { code: 'PG', label: 'გამთამაშებელი' },
+  { code: 'SG', label: 'მსროლელი' },
+  { code: 'SF', label: 'მსუბუქი ფორვარდი' },
+  { code: 'PF', label: 'მძიმე ფორვარდი' },
+  { code: 'C', label: 'ცენტრი' },
+];
+
 @Component({
   selector: 'app-player-form-dialog',
   standalone: true,
@@ -33,6 +42,7 @@ export class PlayerFormDialogComponent implements OnInit {
   private readonly teamsService = inject(TeamsService);
   readonly data = inject<Player | null>(MAT_DIALOG_DATA, { optional: true });
   readonly teams = signal<Team[]>([]);
+  readonly positions = PLAYER_POSITIONS;
 
   readonly form = this.fb.nonNullable.group({
     firstName: [this.data?.firstName ?? '', Validators.required],
@@ -52,7 +62,7 @@ export class PlayerFormDialogComponent implements OnInit {
   submit(): void {
     if (this.form.invalid) return;
     const v = this.form.getRawValue();
-    const dto: PlayerCreateDto & { id?: string } = {
+    const dto: PlayerCreateDto & { _id?: string } = {
       firstName: v.firstName,
       lastName: v.lastName,
       number: v.number,
@@ -62,7 +72,8 @@ export class PlayerFormDialogComponent implements OnInit {
       teamId: v.teamId,
       photo: v.photo || undefined,
     };
-    if (this.data?.id) dto.id = this.data.id;
+    console.log(this.data?._id, dto);
+    if (this.data?._id) dto._id = this.data._id;
     this.ref.close(dto);
   }
 }

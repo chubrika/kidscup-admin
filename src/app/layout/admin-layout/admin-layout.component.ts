@@ -103,11 +103,11 @@ export class AdminLayoutComponent {
 
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
-    { label: 'Teams', route: '/teams', icon: 'groups' },
-    { label: 'Players', route: '/players', icon: 'person' },
-    { label: 'Matches', route: '/matches', icon: 'sports_esports' },
-    { label: 'Standings', route: '/standings', icon: 'leaderboard' },
-    { label: 'Age Categories', route: '/categories', icon: 'category' },
-    { label: 'Media', route: '/media', icon: 'photo_library' },
+    { label: 'გუნდი', route: '/teams', icon: 'groups' },
+    { label: 'მოთამაშეები', route: '/players', icon: 'person' },
+    { label: 'თამაშები', route: '/matches', icon: 'sports_esports' },
+    { label: 'ცხრილები', route: '/standings', icon: 'leaderboard' },
+    { label: 'ტურნირები', route: '/categories', icon: 'category' },
+    { label: 'ფოტოები', route: '/media', icon: 'photo_library' },
   ];
 }

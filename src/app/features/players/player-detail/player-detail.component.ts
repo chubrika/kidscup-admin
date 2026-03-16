@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlayersService } from '../players.service';
 import { Player } from '../../../core/models/player.model';
 import { PlayerFormDialogComponent } from '../players-list/player-form-dialog/player-form-dialog.component';
@@ -21,14 +21,21 @@ import { MatDialog } from '@angular/material/dialog';
   `],
 })
 export class PlayerDetailComponent implements OnInit {
-  readonly playerId = input.required<string>();
+  readonly playerId = signal<string | undefined>(undefined);
   private readonly playersService = inject(PlayersService);
   private readonly dialog = inject(MatDialog);
+  private readonly route = inject(ActivatedRoute);
   readonly router = inject(Router);
   readonly player = signal<Player | null>(null);
 
   ngOnInit(): void {
-    this.playersService.getById(this.playerId()).subscribe((p) => this.player.set(p ?? null));
+    const id =
+    this.route.snapshot.paramMap.get('id') ??
+    this.route.parent?.snapshot.paramMap.get('id') ??
+    undefined;
+  this.playerId.set(id);
+  if (!id) return;
+    this.playersService.getById(id).subscribe((p) => this.player.set(p ?? null));
   }
 
   openEditDialog(): void {
