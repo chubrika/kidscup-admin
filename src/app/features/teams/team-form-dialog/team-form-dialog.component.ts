@@ -9,6 +9,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { Team, TeamCreateDto } from '../../../core/models/team.model';
 import { Category } from '../../../core/models/category.model';
 import { CategoriesService } from '../../../core/services/categories.service';
+import { Season } from '../../../core/models/season.model';
+import { SeasonService } from '../../../core/services/season.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { Subject, catchError, finalize, last, of, switchMap, takeUntil, tap } from 'rxjs';
 
@@ -37,10 +39,12 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly ref = inject(MatDialogRef<TeamFormDialogComponent>);
   private readonly categoriesService = inject(CategoriesService);
+  private readonly seasonService = inject(SeasonService);
   private readonly uploadService = inject(UploadService);
   readonly data = inject<Team | null>(MAT_DIALOG_DATA, { optional: true });
 
   categories: Category[] = [];
+  seasons: Season[] = [];
 
   readonly uploading = signal(false);
   readonly uploadProgress = signal<number | null>(null);
@@ -54,6 +58,7 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
     city: [this.data?.city ?? '', Validators.required],
     coachName: [this.data?.coachName ?? '', Validators.required],
     ageCategory: [this.getAgeCategoryId(this.data) ?? '', Validators.required],
+    season: [this.getSeasonId(this.data) ?? ''],
     logo: [this.data?.logo ?? ''],
     logoKey: [this.data?.logoKey ?? ''],
   });
@@ -66,6 +71,30 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
         this.form.patchValue({ ageCategory: list[0]._id });
       }
     });
+
+    // Load seasons and keep in sync with selected category
+    this.form
+      .get('ageCategory')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((ageCategory) => {
+        const catId = ageCategory != null && ageCategory !== '' ? String(ageCategory) : '';
+        if (!/^[a-fA-F0-9]{24}$/.test(catId)) {
+          this.seasons = [];
+          this.form.patchValue({ season: '' }, { emitEvent: false });
+          return;
+        }
+        this.seasonService.getSeasons({ ageCategory: catId }).subscribe((list) => {
+          this.seasons = list;
+          const currentSeason = this.form.get('season')?.value;
+          const currentId = currentSeason != null && currentSeason !== '' ? String(currentSeason) : '';
+          if (currentId && list.some((s) => s._id === currentId)) return;
+          this.form.patchValue({ season: list[0]?._id ?? '' }, { emitEvent: false });
+        });
+      });
+
+    // Trigger initial seasons load (for edit and initial create)
+    const initialCategory = this.form.get('ageCategory')?.value;
+    if (initialCategory) this.form.patchValue({ ageCategory: initialCategory });
 
     // Cleanup temp upload on cancel/backdrop/escape
     this.ref.beforeClosed().pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -87,6 +116,13 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
       return /^[a-fA-F0-9]{24}$/.test(ac) ? ac : null;
     }
     return (ac as { _id?: string })._id ?? null;
+  }
+
+  private getSeasonId(team: Team | null | undefined): string | null {
+    const season = team?.season;
+    if (!season) return null;
+    if (typeof season === 'string') return /^[a-fA-F0-9]{24}$/.test(season) ? season : null;
+    return (season as { _id?: string })._id ?? null;
   }
 
   onFileSelected(evt: Event): void {
@@ -165,11 +201,14 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
     const raw = value.ageCategory != null && value.ageCategory !== '' ? String(value.ageCategory).trim() : undefined;
     // Only send if it looks like a MongoDB ObjectId; never send category name (e.g. "U12")
     const ageCategoryValue = raw && /^[a-fA-F0-9]{24}$/.test(raw) ? raw : undefined;
+    const seasonRaw = value.season != null && value.season !== '' ? String(value.season).trim() : undefined;
+    const seasonValue = seasonRaw && /^[a-fA-F0-9]{24}$/.test(seasonRaw) ? seasonRaw : undefined;
     const dto: TeamCreateDto & { id?: string } = {
       name: value.name,
       city: value.city,
       coachName: value.coachName,
       ageCategory: ageCategoryValue,
+      season: seasonValue,
       logo: value.logo || undefined,
       logoKey: value.logoKey || undefined,
     };

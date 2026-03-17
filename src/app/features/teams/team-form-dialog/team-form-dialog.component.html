@@ -14,10 +14,19 @@
       <input matInput formControlName="coachName" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>ჩემპიონატი</mat-label>
+      <mat-label>ასაკობრივი კატეგორია</mat-label>
       <mat-select formControlName="ageCategory">
         @for (cat of categories; track cat._id) {
           <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>სეზონი</mat-label>
+      <mat-select formControlName="season">
+        <mat-option [value]="''">—</mat-option>
+        @for (s of seasons; track s._id) {
+          <mat-option [value]="s._id">{{ s.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
