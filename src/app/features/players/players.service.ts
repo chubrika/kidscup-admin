@@ -37,7 +37,7 @@ export class PlayersService {
   }
 
   update(id: string, dto: Partial<PlayerCreateDto>): Observable<Player> {
-    return this.api.patch<Player>(`/players/${id}`, dto).pipe(
+    return this.api.put<Player>(`/players/${id}`, dto).pipe(
       delay(200),
       catchError(() => of({ _id: id, ...dto } as unknown as Player)),
     );

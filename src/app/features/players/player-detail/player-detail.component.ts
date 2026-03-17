@@ -43,8 +43,9 @@ export class PlayerDetailComponent implements OnInit {
     if (!p) return;
     const ref = this.dialog.open(PlayerFormDialogComponent, { width: '480px', data: p });
     ref.afterClosed().subscribe((result) => {
-      if (result?.id) {
-        this.playersService.update(result.id, result).subscribe((updated) => this.player.set(updated));
+      if (result?._id) {
+        const { _id, ...payload } = result as { _id: string; [k: string]: unknown };
+        this.playersService.update(_id, payload).subscribe((updated) => this.player.set(updated));
       }
     });
   }

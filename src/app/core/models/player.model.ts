@@ -10,12 +10,13 @@ export interface Player {
   birthDate: string;
   height?: number;
   photo?: string;
+  photoKey?: string;
   teamId: {
     _id: string;
     name: string;
     logo?: string;
     city?: string;
-  } | string;
+  };
   teamName?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -29,6 +30,7 @@ export interface PlayerCreateDto {
   birthDate: string;
   height?: number;
   photo?: string;
+  photoKey?: string;
   teamId: {
     _id: string;
     name: string;

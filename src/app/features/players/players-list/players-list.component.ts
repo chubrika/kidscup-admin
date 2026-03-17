@@ -37,8 +37,9 @@ export class PlayersListComponent implements OnInit {
     const ref = this.dialog.open(PlayerFormDialogComponent, { width: '480px', data: null });
     ref.afterClosed().subscribe((result) => {
       if (result) {
-        if (result.id) {
-          this.playersService.update(result.id, result).subscribe(() => this.refresh());
+        if (result._id) {
+          const { _id, ...payload } = result as { _id: string; [k: string]: unknown };
+          this.playersService.update(_id, payload).subscribe(() => this.refresh());
         } else {
           this.playersService.create(result).subscribe(() => this.refresh());
         }

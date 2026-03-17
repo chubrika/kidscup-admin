@@ -107,7 +107,9 @@ export class AdminLayoutComponent {
     { label: 'მოთამაშეები', route: '/players', icon: 'person' },
     { label: 'თამაშები', route: '/matches', icon: 'sports_esports' },
     { label: 'ცხრილები', route: '/standings', icon: 'leaderboard' },
+    { label: 'სეზონები', route: '/seasons', icon: 'date_range' },
     { label: 'ტურნირები', route: '/categories', icon: 'category' },
     { label: 'ფოტოები', route: '/media', icon: 'photo_library' },
+    { label: 'სიახლეები', route: '/news', icon: 'newspaper' },
   ];
 }

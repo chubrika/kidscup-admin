@@ -21,13 +21,38 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Logo URL</mat-label>
-      <input matInput formControlName="logo" placeholder="https://..." />
-    </mat-form-field>
+    <div class="upload-row">
+      <div class="preview">
+        @if (previewUrl()) {
+          <img [src]="previewUrl()!" alt="Team logo preview" />
+        } @else {
+          <span style="font-size: 12px; color: #64748b;">No logo</span>
+        }
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="uploading()">
+          აირჩიე ლოგო
+        </button>
+        <span style="font-size: 12px; color: #64748b;">JPG/PNG • max 2MB</span>
+        @if (uploading()) {
+          <span style="font-size: 12px; color: #64748b;">
+            Progress: {{ uploadProgress() ?? 0 }}%
+          </span>
+        }
+      </div>
+    </div>
+
+    <input #fileInput type="file" accept="image/jpeg,image/png" hidden (change)="onFileSelected($event)" />
+
+    @if (uploadError()) {
+      <div class="error">{{ uploadError() }}</div>
+    }
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">შენახვა</button>
+    <button mat-button type="button" (click)="cancel()" [disabled]="uploading()">გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || uploading()">
+      @if (uploading()) { იტვირთება... } @else { შენახვა }
+    </button>
   </mat-dialog-actions>
 </form>

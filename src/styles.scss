@@ -15,6 +15,18 @@ body {
   width: 100%;
 }
 
+/* Fix Tailwind preflight breaking Material outline form field (notch border) */
+.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__notch {
+  border-right-style: none;
+}
+
+/* Ensure Material inputs/textarea are not reset by Tailwind in a way that breaks layout */
+.mat-mdc-form-field .mat-mdc-input-element,
+.mat-mdc-form-field input,
+.mat-mdc-form-field textarea {
+  box-sizing: border-box;
+}
+
 /* Material Icons font for <mat-icon> */
 .mat-icon,
 .material-icons {

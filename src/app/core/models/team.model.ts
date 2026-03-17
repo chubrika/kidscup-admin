@@ -2,6 +2,7 @@ export interface Team {
   _id: string;
   name: string;
   logo?: string;
+  logoKey?: string;
   city: string;
   coachName: string;
   /** Category ID (string) or populated category object from API */
@@ -13,6 +14,7 @@ export interface Team {
 export interface TeamCreateDto {
   name: string;
   logo?: string;
+  logoKey?: string;
   city: string;
   coachName: string;
   /** Category ID (MongoDB ObjectId string) */

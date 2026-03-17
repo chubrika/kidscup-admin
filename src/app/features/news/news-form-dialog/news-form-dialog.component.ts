@@ -1,28 +1,17 @@
-import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { Player, PlayerCreateDto } from '@app/core/models/player.model';
-import { TeamsService } from '@app/features/teams/teams.service';
-import { Team } from '@app/core/models/team.model';
+import { Editor, NgxEditorComponent, NgxEditorMenuComponent } from 'ngx-editor';
+import { News, NewsCreateDto } from '@app/core/models/news.model';
 import { UploadService } from '@app/core/services/upload.service';
 import { Subject, catchError, finalize, last, of, switchMap, takeUntil, tap } from 'rxjs';
 
-/** Basketball positions: short code stored in DB, label shown in UI */
-export const PLAYER_POSITIONS: { code: string; label: string }[] = [
-  { code: 'PG', label: 'გამთამაშებელი' },
-  { code: 'SG', label: 'მსროლელი' },
-  { code: 'SF', label: 'მსუბუქი ფორვარდი' },
-  { code: 'PF', label: 'მძიმე ფორვარდი' },
-  { code: 'C', label: 'ცენტრი' },
-];
-
 @Component({
-  selector: 'app-player-form-dialog',
+  selector: 'app-news-form-dialog',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -30,52 +19,81 @@ export const PLAYER_POSITIONS: { code: string; label: string }[] = [
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule,
+    NgxEditorComponent,
+    NgxEditorMenuComponent,
   ],
-  templateUrl: './player-form-dialog.component.html',
+  templateUrl: './news-form-dialog.component.html',
   styles: [`
-    form { display: flex; flex-direction: column; min-width: 360px; }
-    mat-dialog-content { display: flex; flex-direction: column; gap: 8px; }
+    .news-form {
+      display: flex;
+      flex-direction: column;
+      min-width: 400px;
+    }
+
+    .news-dialog-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .news-field {
+      display: block;
+      width: 100%;
+    }
+
+    .news-editor-label {
+      display: block;
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .news-editor-wrapper {
+      border: 1px solid rgba(0, 0, 0, 0.38);
+      border-radius: 4px;
+      overflow: hidden;
+      min-height: 180px;
+    }
+
+    .news-editor-wrapper:focus-within {
+      border-color: var(--mat-form-field-outline-color, #1976d2);
+      border-width: 2px;
+    }
+
+    .news-editor-wrapper ::ng-deep .NgxEditor {
+      min-height: 160px;
+    }
+
+    .news-editor-wrapper ::ng-deep .NgxEditor__Content {
+      min-height: 160px;
+    }
   `],
 })
-export class PlayerFormDialogComponent implements OnInit, OnDestroy {
+export class NewsFormDialogComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
-  private readonly ref = inject(MatDialogRef<PlayerFormDialogComponent>);
-  private readonly teamsService = inject(TeamsService);
+  private readonly ref = inject(MatDialogRef<NewsFormDialogComponent>);
   private readonly uploadService = inject(UploadService);
-  readonly data = inject<Player | null>(MAT_DIALOG_DATA, { optional: true });
-  readonly teams = signal<Team[]>([]);
-  readonly positions = PLAYER_POSITIONS;
+  readonly data = inject<News | null>(MAT_DIALOG_DATA, { optional: true });
+
+  editor: Editor | null = null;
 
   readonly uploading = signal(false);
   readonly uploadProgress = signal<number | null>(null);
   readonly uploadError = signal<string | null>(null);
-  readonly previewUrl = signal<string | null>(this.data?.photo ?? null);
+  readonly previewUrl = signal<string | null>(this.data?.photoUrl ?? null);
   private readonly destroy$ = new Subject<void>();
   private closingForSubmit = false;
 
   readonly form = this.fb.nonNullable.group({
-    firstName: [this.data?.firstName ?? '', Validators.required],
-    lastName: [this.data?.lastName ?? '', Validators.required],
-    number: [this.data?.number ?? 0, [Validators.required, Validators.min(0)]],
-    position: [this.data?.position ?? '', Validators.required],
-    birthDate: [this.data?.birthDate ? new Date(this.data.birthDate).toISOString().split('T')[0] : '', Validators.required],
-    height: [this.data?.height ?? null as number | null],
-    // Always store teamId as a string, so mat-select can match option values (`t._id`).
-    teamId: [this.getTeamId(this.data) ?? '', Validators.required],
-    photo: [this.data?.photo ?? ''],
+    title: [this.data?.title ?? '', Validators.required],
+    description: [this.data?.description ?? ''],
+    photoUrl: [this.data?.photoUrl ?? ''],
     photoKey: [this.data?.photoKey ?? ''],
   });
 
-  private getTeamId(player: Player | null | undefined): string | null {
-    const team = player?.teamId;
-    if (!team) return null;
-    if (typeof team === 'string') return team;
-    return team._id ?? null;
-  }
-
   ngOnInit(): void {
-    this.teamsService.getAll().subscribe((t) => this.teams.set(t));
+    this.editor = new Editor();
 
     // Cleanup temp upload on cancel/backdrop/escape
     this.ref.beforeClosed().pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -85,6 +103,7 @@ export class PlayerFormDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.editor?.destroy();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -128,13 +147,16 @@ export class PlayerFormDialogComponent implements OnInit, OnDestroy {
             tap((p) => this.uploadProgress.set(p)),
             last(),
             tap(() => {
-              this.form.patchValue({ photo: res.fileUrl, photoKey: res.key });
+              this.form.patchValue({ photoUrl: res.fileUrl, photoKey: res.key });
               this.previewUrl.set(res.fileUrl);
             }),
-          )
+          ),
         ),
         catchError((err) => {
-          const msg = (err && typeof err === 'object' && 'message' in err) ? String((err as { message?: unknown }).message) : 'Upload failed';
+          const msg =
+            err && typeof err === 'object' && 'message' in err
+              ? String((err as { message?: unknown }).message)
+              : 'Upload failed';
           this.uploadError.set(msg);
           return of(undefined);
         }),
@@ -154,26 +176,16 @@ export class PlayerFormDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  cancel(): void {
-    // Triggers beforeClosed() cleanup
-    this.ref.close();
-  }
-
   submit(): void {
     if (this.form.invalid) return;
     const v = this.form.getRawValue();
-    const dto: PlayerCreateDto & { _id?: string } = {
-      firstName: v.firstName,
-      lastName: v.lastName,
-      number: v.number,
-      position: v.position,
-      birthDate: v.birthDate,
-      height: v.height ?? undefined,
-      teamId: String(v.teamId),
-      photo: v.photo || undefined,
+    const dto: NewsCreateDto & { _id?: string } = {
+      title: v.title,
+      description: v.description,
+      photoUrl: v.photoUrl,
       photoKey: v.photoKey || undefined,
     };
-    if (this.data?._id) dto._id = this.data._id;
+    if (this.data?._id) (dto as { _id: string })._id = this.data._id;
     this.closingForSubmit = true;
     this.ref.close(dto);
   }

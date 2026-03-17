@@ -37,6 +37,7 @@ export class MatchesService {
       time: dto.time,
       location: dto.location,
       ageCategory: dto.ageCategory || undefined,
+      season: dto.seasonId || undefined,
       status: dto.status,
       scoreHome: dto.scoreHome,
       scoreAway: dto.scoreAway,
@@ -48,7 +49,9 @@ export class MatchesService {
   }
 
   update(id: string, dto: Partial<MatchCreateDto>): Observable<Match> {
-    return this.api.patch<Match>(`/matches/${id}`, dto).pipe(
+    const { seasonId, ...rest } = dto;
+    const body = { ...rest, ...(seasonId !== undefined && { season: seasonId }) };
+    return this.api.patch<Match>(`/matches/${id}`, body).pipe(
       delay(200),
       catchError(() => of({ id, ...dto } as unknown as Match)),
     );

@@ -16,7 +16,8 @@
         <dt>Position</dt><dd>{{ player()!.position }}</dd>
         <dt>Birth Date</dt><dd>{{ player()!.birthDate }}</dd>
         <dt>Height</dt><dd>{{ player()!.height ? player()!.height + ' cm' : '-' }}</dd>
-        <dt>Team</dt><dd><a [routerLink]="['/teams', player()!.teamId]">{{ player()!.teamName ?? '-' }}</a></dd>
+        <dt>Team</dt><dd><a [routerLink]="['/teams', player()!.teamId._id]">{{ player()!.teamId.name }}</a></dd>
+        <dt>Photo</dt><dd><img [src]="player()!.photo || '/assets/images/avatar.png'" alt="Player Photo" width="100" height="100" /></dd>
       </dl>
     </mat-card-content>
   </mat-card>

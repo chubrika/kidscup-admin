@@ -28,6 +28,7 @@ export interface MatchCreateDto {
   time: string;
   location: string;
   ageCategory: string;
+  seasonId?: string;
   status: MatchStatus;
   scoreHome?: number;
   scoreAway?: number;

@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
+  // Use dev-server proxy for local development (see `proxy.conf.json`).
+  apiUrl: '/api',
 };

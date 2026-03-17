@@ -52,6 +52,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": { "buildTarget": "kidscup-admin:build:production" },
             "development": { "buildTarget": "kidscup-admin:build:development" }
