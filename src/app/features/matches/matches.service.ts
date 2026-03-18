@@ -49,8 +49,14 @@ export class MatchesService {
   }
 
   update(id: string, dto: Partial<MatchCreateDto>): Observable<Match> {
-    const { seasonId, ...rest } = dto;
-    const body = { ...rest, ...(seasonId !== undefined && { season: seasonId }) };
+    // Keep PATCH payload consistent with CREATE payload (backend expects homeTeam/awayTeam/season keys).
+    const { seasonId, homeTeamId, awayTeamId, ...rest } = dto;
+    const body: Record<string, unknown> = {
+      ...rest,
+      ...(homeTeamId !== undefined && { homeTeam: homeTeamId }),
+      ...(awayTeamId !== undefined && { awayTeam: awayTeamId }),
+      ...(seasonId !== undefined && { season: seasonId }),
+    };
     return this.api.patch<Match>(`/matches/${id}`, body).pipe(
       delay(200),
       catchError(() => of({ id, ...dto } as unknown as Match)),
