@@ -15,6 +15,13 @@ export class MatchesService {
     );
   }
 
+  getLive(): Observable<Match[]> {
+    return this.api.get<Match[]>('/matches', { status: 'live' }).pipe(
+      delay(200),
+      catchError(() => of([])),
+    );
+  }
+
   getByTeam(teamId: string): Observable<Match[]> {
     return this.api.get<Match[]>('/matches', { teamId }).pipe(
       delay(200),

@@ -6,9 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatchesService } from '../matches.service';
 import { Match, MatchStatus } from '../../../core/models/match.model';
+import { LiveScoringComponent } from '../live-scoring/live-scoring.component';
 
 @Component({
   selector: 'app-match-detail',
@@ -21,6 +23,8 @@ import { Match, MatchStatus } from '../../../core/models/match.model';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatTabsModule,
+    LiveScoringComponent,
   ],
   templateUrl: './match-detail.component.html',
   styles: [`
