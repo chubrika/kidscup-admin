@@ -25,20 +25,8 @@ export interface TeamScore {
   points: number;
 }
 
-export interface PlayerStatLine {
-  playerId: string;
-  teamId: string;
-  points: number;
-  assists: number;
-  rebounds: number;
-  steals: number;
-  blocks: number;
-  fouls: number;
-}
-
 export interface MatchStats {
   teamScores: TeamScore[];
-  playerStats: PlayerStatLine[];
 }
 
 export interface MatchEvent {
@@ -89,7 +77,7 @@ export class LiveMatchService implements OnDestroy {
   }
 
   getStats(matchId: string): Observable<MatchStats> {
-    return this.api.get<MatchStats>(`/matches/${matchId}/stats`);
+    return this.api.get<MatchStats>(`/matches/${matchId}/team-scores`);
   }
 
   getTimeline(matchId: string, limit = 50): Observable<MatchEvent[]> {

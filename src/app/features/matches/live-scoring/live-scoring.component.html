@@ -1,7 +1,7 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>Live Scoring</mat-card-title>
-    <mat-card-subtitle>Event-based player stats (derived from match events)</mat-card-subtitle>
+    <mat-card-subtitle>Team points (derived from match events)</mat-card-subtitle>
   </mat-card-header>
 
   <mat-card-content>
@@ -22,52 +22,26 @@
     <div class="grid" style="margin-top: 16px;">
       <div>
         <h3 style="margin: 0 0 8px;">{{ match.homeTeam?.name }}</h3>
-        @for (p of homePlayers(); track p._id) {
-          <div class="player-row">
-            <div class="player-header">
-              <div class="name">{{ playerName(p) }}</div>
-              <div class="line">
-                PTS {{ lineFor(p._id).points }} · AST {{ lineFor(p._id).assists }} · REB {{ lineFor(p._id).rebounds }}
-                · STL {{ lineFor(p._id).steals }} · BLK {{ lineFor(p._id).blocks }} · FOUL {{ lineFor(p._id).fouls }}
-              </div>
-            </div>
-            <div class="actions">
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.homeTeam?._id, 'POINT_1')">+1</button>
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.homeTeam?._id, 'POINT_2')">+2</button>
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.homeTeam?._id, 'POINT_3')">+3</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.homeTeam?._id, 'ASSIST')">Assist</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.homeTeam?._id, 'REBOUND')">Rebound</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.homeTeam?._id, 'STEAL')">Steal</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.homeTeam?._id, 'BLOCK')">Block</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.homeTeam?._id, 'FOUL')">Foul</button>
-            </div>
-          </div>
-        }
+        <div class="scoreboard" style="margin-bottom: 12px;">
+          <div class="score">{{ homeScore() }}</div>
+        </div>
+        <div class="actions">
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.homeTeam?._id, 'POINT_1')">+1</button>
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.homeTeam?._id, 'POINT_2')">+2</button>
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.homeTeam?._id, 'POINT_3')">+3</button>
+        </div>
       </div>
 
       <div>
         <h3 style="margin: 0 0 8px;">{{ match.awayTeam?.name }}</h3>
-        @for (p of awayPlayers(); track p._id) {
-          <div class="player-row">
-            <div class="player-header">
-              <div class="name">{{ playerName(p) }}</div>
-              <div class="line">
-                PTS {{ lineFor(p._id).points }} · AST {{ lineFor(p._id).assists }} · REB {{ lineFor(p._id).rebounds }}
-                · STL {{ lineFor(p._id).steals }} · BLK {{ lineFor(p._id).blocks }} · FOUL {{ lineFor(p._id).fouls }}
-              </div>
-            </div>
-            <div class="actions">
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.awayTeam?._id, 'POINT_1')">+1</button>
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.awayTeam?._id, 'POINT_2')">+2</button>
-              <button mat-flat-button color="primary" type="button" (click)="add(p._id, match.awayTeam?._id, 'POINT_3')">+3</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.awayTeam?._id, 'ASSIST')">Assist</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.awayTeam?._id, 'REBOUND')">Rebound</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.awayTeam?._id, 'STEAL')">Steal</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.awayTeam?._id, 'BLOCK')">Block</button>
-              <button mat-stroked-button type="button" (click)="add(p._id, match.awayTeam?._id, 'FOUL')">Foul</button>
-            </div>
-          </div>
-        }
+        <div class="scoreboard" style="margin-bottom: 12px;">
+          <div class="score">{{ awayScore() }}</div>
+        </div>
+        <div class="actions">
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.awayTeam?._id, 'POINT_1')">+1</button>
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.awayTeam?._id, 'POINT_2')">+2</button>
+          <button mat-flat-button color="primary" type="button" (click)="addForTeam(match.awayTeam?._id, 'POINT_3')">+3</button>
+        </div>
       </div>
     </div>
 
@@ -80,7 +54,7 @@
               <div><strong>{{ e.type }}</strong> <span class="evt-meta">(+{{ e.value }})</span></div>
               <div class="evt-meta">{{ e.createdAt | date:'medium' }}</div>
             </div>
-            <div class="evt-meta">player: {{ e.playerId }}</div>
+            <div class="evt-meta">team: {{ e.teamId }}</div>
           </div>
         }
       </div>

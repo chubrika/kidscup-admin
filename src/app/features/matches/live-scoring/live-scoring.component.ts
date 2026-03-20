@@ -36,7 +36,7 @@ export class LiveScoringComponent implements OnInit {
 
   @Input({ required: true }) match!: Match;
 
-  readonly stats = signal<MatchStats>({ teamScores: [], playerStats: [] });
+  readonly stats = signal<MatchStats>({ teamScores: [] });
   readonly timeline = signal<MatchEvent[]>([]);
 
   readonly homePlayers = signal<{ _id: string; name?: string; firstName?: string; lastName?: string }[]>([]);
@@ -87,29 +87,20 @@ export class LiveScoringComponent implements OnInit {
       });
   }
 
-  playerName(p: { name?: string; firstName?: string; lastName?: string }): string {
-    if (p.name) return p.name;
-    return [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Player';
+  private resolvePlayerIdForTeam(teamId: string | undefined): string | null {
+    if (!teamId) return null;
+    const homeTeamId = this.match?.homeTeam?._id;
+    const awayTeamId = this.match?.awayTeam?._id;
+
+    if (homeTeamId && teamId === homeTeamId) return this.homePlayers()[0]?._id ?? null;
+    if (awayTeamId && teamId === awayTeamId) return this.awayPlayers()[0]?._id ?? null;
+    return null;
   }
 
-  lineFor(playerId: string): MatchStats['playerStats'][number] {
-    return (
-      this.stats().playerStats.find((s) => s.playerId === playerId) ?? {
-        playerId,
-        teamId: '',
-        points: 0,
-        assists: 0,
-        rebounds: 0,
-        steals: 0,
-        blocks: 0,
-        fouls: 0,
-      }
-    );
-  }
-
-  add(playerId: string, teamId: string | undefined, type: MatchEventType): void {
+  addForTeam(teamId: string | undefined, type: MatchEventType): void {
     const matchId = this.match._id;
-    if (!teamId) return;
+    const playerId = this.resolvePlayerIdForTeam(teamId);
+    if (!playerId || !teamId) return;
     this.liveMatchService
       .addEvent(matchId, { playerId, teamId, type })
       .pipe(takeUntilDestroyed(this.destroyRef))
