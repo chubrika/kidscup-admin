@@ -7,10 +7,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
-import { Subject, catchError, map, merge, of, startWith, switchMap } from 'rxjs';
+import { Subject, catchError, forkJoin, map, merge, of, startWith, switchMap } from 'rxjs';
 import { DashboardService } from './dashboard.service';
+import { AppConfigService } from '../../core/services/app-config.service';
+import { PublicAppConfig } from '../../core/models/app-config.model';
 import {
   DashboardActivityType,
   DashboardBundle,
@@ -24,6 +27,7 @@ type DashboardState =
   | {
       kind: 'ok';
       data: DashboardBundle;
+      config: PublicAppConfig;
       lineChartData: ChartData<'line'>;
       pieChartData: ChartData<'pie'> | null;
     };
@@ -40,6 +44,7 @@ type DashboardState =
     MatProgressSpinnerModule,
     MatDividerModule,
     MatListModule,
+    MatSlideToggleModule,
     BaseChartDirective,
   ],
   templateUrl: './dashboard.component.html',
@@ -48,17 +53,24 @@ type DashboardState =
 })
 export class DashboardComponent {
   private readonly dashboardService = inject(DashboardService);
+  private readonly appConfigService = inject(AppConfigService);
   private readonly refresh$ = new Subject<void>();
+
+  configPatchPending = false;
 
   readonly state$ = this.refresh$.pipe(
     startWith(undefined),
     switchMap(() =>
       merge(
         of<DashboardState>({ kind: 'loading' }),
-        this.dashboardService.getDashboardBundle().pipe(
-          map((data) => ({
+        forkJoin({
+          data: this.dashboardService.getDashboardBundle(),
+          config: this.appConfigService.getPublicConfig(),
+        }).pipe(
+          map(({ data, config }) => ({
             kind: 'ok' as const,
             data,
+            config,
             lineChartData: this.buildLineChartData(data.charts),
             pieChartData: this.buildPieChartData(data.charts),
           })),
@@ -103,6 +115,22 @@ export class DashboardComponent {
 
   retry(): void {
     this.refresh$.next();
+  }
+
+  toggleTeamRegistration(enabled: boolean): void {
+    this.configPatchPending = true;
+    this.appConfigService
+      .patchConfig({ key: 'team_registration_enabled', value: enabled })
+      .subscribe({
+        next: () => {
+          this.configPatchPending = false;
+          this.refresh$.next();
+        },
+        error: () => {
+          this.configPatchPending = false;
+          this.refresh$.next();
+        },
+      });
   }
 
   /** True when the 30-day series has no registrations (all zeros). */

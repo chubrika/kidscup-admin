@@ -22,7 +22,22 @@
   }
 
   @if (state.kind === 'ok') {
-    
+    <mat-card class="site-settings mb-4">
+      <mat-card-header>
+        <mat-card-title>configs</mat-card-title>
+        <mat-card-subtitle>ჩემპიონატის გამოცხადება</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="site-settings__row">
+        <mat-slide-toggle
+          [checked]="state.config.team_registration_enabled"
+          [disabled]="configPatchPending"
+          (change)="toggleTeamRegistration($event.source.checked)"
+        >
+          გუნდების რეგისტრაციის ჩართვა
+        </mat-slide-toggle>
+      </mat-card-content>
+    </mat-card>
+
     <mat-card class="quick-actions mb-4">
       <mat-card-content class="quick-actions__grid">
         <a mat-flat-button color="primary" routerLink="/teams">
