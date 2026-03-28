@@ -1,47 +1,223 @@
-<h1 class="page-title">Dashboard</h1>
-<div class="stats-grid">
-  <mat-card class="stat-card">
-    <mat-card-content>
-      <div class="stat-icon teams">
-        <mat-icon>groups</mat-icon>
+@if (state$ | async; as state) {
+  <header class="dash-header">
+    <div>
+      <h1 class="dash-title">Dashboard</h1>
+    </div>
+    @if (state.kind === 'error') {
+      <div class="dash-error" role="alert">
+        <mat-icon>cloud_off</mat-icon>
+        <span>{{ state.message }}</span>
+        <button mat-stroked-button color="primary" type="button" (click)="retry()">
+          Retry
+        </button>
       </div>
-      <div class="stat-content">
-        <span class="stat-value">{{ stats()?.totalTeams ?? '-' }}</span>
-        <span class="stat-label">Total Teams</span>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="stat-card">
-    <mat-card-content>
-      <div class="stat-icon players">
-        <mat-icon>person</mat-icon>
-      </div>
-      <div class="stat-content">
-        <span class="stat-value">{{ stats()?.totalPlayers ?? '-' }}</span>
-        <span class="stat-label">Total Players</span>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="stat-card">
-    <mat-card-content>
-      <div class="stat-icon upcoming">
-        <mat-icon>event</mat-icon>
-      </div>
-      <div class="stat-content">
-        <span class="stat-value">{{ stats()?.upcomingMatches ?? '-' }}</span>
-        <span class="stat-label">Upcoming Matches</span>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="stat-card">
-    <mat-card-content>
-      <div class="stat-icon finished">
-        <mat-icon>sports_score</mat-icon>
-      </div>
-      <div class="stat-content">
-        <span class="stat-value">{{ stats()?.finishedMatches ?? '-' }}</span>
-        <span class="stat-label">Finished Matches</span>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</div>
+    }
+  </header>
+
+  @if (state.kind === 'loading') {
+    <div class="dash-loading" aria-busy="true" aria-label="Loading dashboard">
+      <mat-spinner diameter="48" />
+      <span>Loading dashboard&hellip;</span>
+    </div>
+  }
+
+  @if (state.kind === 'ok') {
+    
+    <mat-card class="quick-actions mb-4">
+      <mat-card-content class="quick-actions__grid">
+        <a mat-flat-button color="primary" routerLink="/teams">
+          <mat-icon>checklist</mat-icon>
+          გუნდების რეგისტრაციის დადასტურება
+        </a>
+        <a mat-stroked-button routerLink="/seasons">
+          <mat-icon>add_circle_outline</mat-icon>
+          ტურნირის შექმნა
+        </a>
+        <a mat-stroked-button routerLink="/matches">
+          <mat-icon>sports_basketball</mat-icon>
+          მატჩის დამატება
+        </a>
+      </mat-card-content>
+    </mat-card>
+    <section class="stat-cards" aria-label="Key statistics">
+      <mat-card class="stat-card" routerLink="/teams" tabindex="0">
+        <mat-card-content>
+          <div class="stat-card__icon stat-card__icon--teams">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="stat-card__text">
+            <span class="stat-card__value">{{ state.data.stats.totalTeams | number }}</span>
+            <span class="stat-card__label">გუნდები</span>
+          </div>
+          <mat-icon class="stat-card__chevron">chevron_right</mat-icon>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card" routerLink="/players" tabindex="0">
+        <mat-card-content>
+          <div class="stat-card__icon stat-card__icon--players">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="stat-card__text">
+            <span class="stat-card__value">{{ state.data.stats.totalPlayers | number }}</span>
+            <span class="stat-card__label">მოთამაშეები</span>
+          </div>
+          <mat-icon class="stat-card__chevron">chevron_right</mat-icon>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card" routerLink="/teams" tabindex="0">
+        <mat-card-content>
+          <div class="stat-card__icon stat-card__icon--pending">
+            <mat-icon>hourglass_top</mat-icon>
+          </div>
+          <div class="stat-card__text">
+            <span class="stat-card__value">{{ state.data.stats.pendingTeams | number }}</span>
+            <span class="stat-card__label">Pending გუნდები</span>
+          </div>
+          <mat-icon class="stat-card__chevron">chevron_right</mat-icon>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card" routerLink="/matches" tabindex="0">
+        <mat-card-content>
+          <div class="stat-card__icon stat-card__icon--today">
+            <mat-icon>today</mat-icon>
+          </div>
+          <div class="stat-card__text">
+            <span class="stat-card__value">{{ state.data.stats.matchesToday | number }}</span>
+            <span class="stat-card__label">თამაშები დღეს</span>
+          </div>
+          <mat-icon class="stat-card__chevron">chevron_right</mat-icon>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card" routerLink="/seasons" tabindex="0">
+        <mat-card-content>
+          <div class="stat-card__icon stat-card__icon--seasons">
+            <mat-icon>emoji_events</mat-icon>
+          </div>
+          <div class="stat-card__text">
+            <span class="stat-card__value">{{ state.data.stats.activeTournaments | number }}</span>
+            <span class="stat-card__label">ტურნირები</span>
+          </div>
+          <mat-icon class="stat-card__chevron">chevron_right</mat-icon>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <section class="charts-row" aria-label="Charts">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>გუნდის რეგისტრაცია</mat-card-title>
+          <mat-card-subtitle>ახალი გუნდი (ბოლო 30 დღე)</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-surface chart-surface--line">
+            <canvas
+              baseChart
+              type="line"
+              [data]="state.lineChartData"
+              [options]="lineChartOptions"
+            ></canvas>
+          </div>
+          @if (isRegistrationsChartEmpty(state.lineChartData)) {
+            <p class="empty-hint">No team registrations in this window yet.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>გუნდების სტატუსი</mat-card-title>
+          <mat-card-subtitle>დადასტურების დიაგრამა</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (state.pieChartData) {
+            <div class="chart-surface chart-surface--pie">
+              <canvas
+                baseChart
+                type="pie"
+                [data]="state.pieChartData"
+                [options]="pieChartOptions"
+              ></canvas>
+            </div>
+          } @else {
+            <div class="empty-block">
+              <mat-icon>pie_chart_outline</mat-icon>
+              <p>No teams in the database yet.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <div class="lower-grid">
+      <mat-card class="panel-card">
+        <mat-card-header>
+          <mat-card-title>ბოლო აქტივობა</mat-card-title>
+          <mat-card-subtitle>ბოლო რეგისტრაციები, დადასტურებები, თამაშები და მოთამაშეები</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (state.data.activity.length === 0) {
+            <div class="empty-block empty-block--compact">
+              <mat-icon>history</mat-icon>
+              <p>No recent activity to show.</p>
+            </div>
+          } @else {
+            <mat-list class="activity-list" role="list">
+              @for (item of state.data.activity; track item.at + item.message) {
+                <mat-list-item role="listitem">
+                  <mat-icon matListItemIcon class="activity-icon">{{
+                    activityIcon(item.type)
+                  }}</mat-icon>
+                  <span matListItemTitle class="activity-msg">{{ item.message }}</span>
+                  <span matListItemLine class="activity-time">{{ item.at | date: 'medium' }}</span>
+                </mat-list-item>
+                @if (!$last) {
+                  <mat-divider />
+                }
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="panel-card">
+        <mat-card-header>
+          <mat-card-title>დღევანდელი თამაშები</mat-card-title>
+          <mat-card-subtitle>დღეს დაგეგმილი თამაშები</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (state.data.matchesToday.length === 0) {
+            <div class="empty-block empty-block--compact">
+              <mat-icon>event_busy</mat-icon>
+              <p>დღეს დაგეგმილი თამაშები არ არის.</p>
+            </div>
+          } @else {
+            <mat-list class="match-list">
+              @for (m of state.data.matchesToday; track m._id) {
+                <mat-list-item>
+                  <div class="match-row">
+                    <div class="match-teams">
+                      <a [routerLink]="['/matches', m._id]" class="match-link">
+                        {{ teamName(m, 'home') }} vs {{ teamName(m, 'away') }}
+                      </a>
+                      <span class="match-meta">
+                        @if (m.time) {
+                          <span class="match-time">{{ m.time }}</span>
+                        }
+                        <span [class]="matchStatusClass(m.status)">{{
+                          displayMatchStatus(m.status)
+                        }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </mat-list-item>
+                @if (!$last) {
+                  <mat-divider />
+                }
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  }
+}

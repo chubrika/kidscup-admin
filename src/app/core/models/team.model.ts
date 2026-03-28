@@ -1,3 +1,5 @@
+export type TeamStatus = 'pending' | 'approved' | 'rejected';
+
 export interface Team {
   _id: string;
   name: string;
@@ -5,6 +7,7 @@ export interface Team {
   logoKey?: string;
   city: string;
   coachName: string;
+  status?: TeamStatus;
   /** Category ID (string) or populated category object from API */
   ageCategory: { _id: string; name?: string };
   /** Season ID (string) or populated season object from API */

@@ -16,10 +16,7 @@ export class PlayersService {
   }
 
   getByTeam(teamId: string): Observable<Player[]> {
-    return this.api.get<Player[]>('/players', { teamId }).pipe(
-      delay(200),
-      catchError(() => of([])),
-    );
+    return this.api.get<Player[]>('/players', { teamId });
   }
 
   getById(id: string): Observable<Player | null> {

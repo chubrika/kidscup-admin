@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>დასამოწმებელი გუნდი: {{ data.team.name }}</h2>
+
+<div mat-dialog-content>
+  <p class="meta">
+    ქალაქი: {{ data.team.city || '—' }} · მწვრთნელი: {{ data.team.coachName || '—' }} · კატეგორია:
+    {{ data.team.ageCategory.name || '—' }}
+  </p>
+
+  @if (error()) {
+    <p class="meta" style="color: #b91c1c">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <div style="display: flex; justify-content: center; padding: 24px">
+      <mat-spinner diameter="36" />
+    </div>
+  } @else {
+    <table mat-table [dataSource]="players()" class="mat-elevation-z0">
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let row">{{ row.number }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>სახელი</th>
+        <td mat-cell *matCellDef="let row">{{ row.firstName }} {{ row.lastName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef>პოზიცია</th>
+        <td mat-cell *matCellDef="let row">{{ row.position || '—' }}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+    @if (players().length === 0) {
+      <p class="meta">მოთამაშეები არ არის.</p>
+    }
+  }
+</div>
+
+<div mat-dialog-actions class="actions">
+  <button mat-button type="button" (click)="close()" [disabled]="busy()">დახურვა</button>
+  <button mat-stroked-button color="warn" type="button" (click)="reject()" [disabled]="busy() || loading()">უარყოფა</button>
+  <button mat-flat-button color="primary" type="button" (click)="approve()" [disabled]="busy() || loading()">დამტკიცება</button>
+</div>

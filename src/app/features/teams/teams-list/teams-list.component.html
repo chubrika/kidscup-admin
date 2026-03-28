@@ -7,11 +7,22 @@
     </button>
   </mat-card-header>
   <mat-card-content>
+    <mat-button-toggle-group
+      class="filter-toggle"
+      [value]="listFilter"
+      (change)="onFilterChange($event.value)"
+      appearance="standard"
+    >
+      <mat-button-toggle value="all">ყველა</mat-button-toggle>
+      <mat-button-toggle value="pending">მოლოდინში</mat-button-toggle>
+      <mat-button-toggle value="approved">დამტკიცებული</mat-button-toggle>
+    </mat-button-toggle-group>
+
     <table mat-table [dataSource]="dataSource" class="teams-table">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>დასახელება</th>
         <td mat-cell *matCellDef="let row">
-          <a [routerLink]="['/teams', row.id]">{{ row.name }}</a>
+          <a [routerLink]="['/teams', row._id]">{{ row.name }}</a>
         </td>
       </ng-container>
       <ng-container matColumnDef="city">
@@ -26,13 +37,40 @@
         <th mat-header-cell *matHeaderCellDef>ჩემპიონატი</th>
         <td mat-cell *matCellDef="let row">{{ row.ageCategory?.name ?? row.ageCategory }}</td>
       </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>სტატუსი</th>
+        <td mat-cell *matCellDef="let row">
+          <span [class]="statusClass(row.status)">{{ statusLabel(row.status) }}</span>
+        </td>
+      </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let row">
-          <button mat-icon-button [routerLink]="['/teams', row._id]">
+          @if (row.status === 'pending') {
+            <button
+              mat-icon-button
+              matTooltip="დეტალების ნახვა"
+              class="teams-icon-view"
+              (click)="openPendingReview(row)"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              matTooltip="დამტკიცება"
+              class="teams-icon-approve"
+              (click)="quickApprove(row)"
+            >
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="უარყოფა" class="teams-icon-reject" (click)="quickReject(row)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          }
+          <button mat-icon-button class="teams-icon-edit" [routerLink]="['/teams', row._id]" matTooltip="რედაქტირება">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="confirmDelete(row)">
+          <button mat-icon-button class="teams-icon-delete" matTooltip="წაშლა" (click)="confirmDelete(row)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>
