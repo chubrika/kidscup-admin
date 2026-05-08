@@ -45,13 +45,27 @@
         }
       </mat-select>
     </mat-form-field>
+    @if (editor) {
+      <div>
+        <label class="match-editor-label">მსაჯები</label>
+        <div class="match-editor-wrapper NgxEditor__Wrapper">
+          <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+          <ngx-editor
+            [editor]="editor"
+            formControlName="refereesInfo"
+            [placeholder]="'ჩაწერე მსაჯების ინფორმაცია...'"
+            [outputFormat]="'html'"
+          ></ngx-editor>
+        </div>
+      </div>
+    }
     <mat-form-field appearance="outline">
-      <mat-label>Status</mat-label>
+      <mat-label>სტატუსი</mat-label>
       <mat-select formControlName="status">
         <mat-option value="scheduled">დაგეგმილი</mat-option>
         <mat-option value="live">Live</mat-option>
         <mat-option value="finished">დასრულებული</mat-option>
-        <mat-option value="postponed">გადატოვებული</mat-option>
+        <mat-option value="postponed">შეჩერებული</mat-option>
         <mat-option value="cancelled">გაუქმებული</mat-option>
       </mat-select>
     </mat-form-field>

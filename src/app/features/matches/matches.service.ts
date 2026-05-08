@@ -45,6 +45,7 @@ export class MatchesService {
       location: dto.location,
       ageCategory: dto.ageCategory || undefined,
       season: dto.seasonId || undefined,
+      refereesInfo: dto.refereesInfo || undefined,
       status: dto.status,
       scoreHome: dto.scoreHome,
       scoreAway: dto.scoreAway,

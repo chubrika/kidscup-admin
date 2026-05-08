@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Editor, NgxEditorComponent, NgxEditorMenuComponent } from 'ngx-editor';
 import { MatchesService } from '../matches.service';
 import { Match, MatchStatus } from '../../../core/models/match.model';
 import { LiveScoringComponent } from '../live-scoring/live-scoring.component';
@@ -25,6 +26,8 @@ import { LiveScoringComponent } from '../live-scoring/live-scoring.component';
     MatSelectModule,
     MatTabsModule,
     LiveScoringComponent,
+    NgxEditorComponent,
+    NgxEditorMenuComponent,
   ],
   templateUrl: './match-detail.component.html',
   styles: [`
@@ -35,9 +38,33 @@ import { LiveScoringComponent } from '../live-scoring/live-scoring.component';
     .meta, .status { color: #64748b; margin: 8px 0 0; }
     form { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
     .placeholder { color: #94a3b8; }
+    .match-editor-label {
+      display: block;
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .match-editor-wrapper {
+      border: 1px solid rgba(0, 0, 0, 0.38);
+      border-radius: 4px;
+      overflow: hidden;
+      min-height: 180px;
+      background: #fff;
+    }
+    .match-editor-wrapper:focus-within {
+      border-color: var(--mat-form-field-outline-color, #1976d2);
+      border-width: 2px;
+    }
+    .match-editor-wrapper ::ng-deep .NgxEditor {
+      min-height: 160px;
+    }
+    .match-editor-wrapper ::ng-deep .NgxEditor__Content {
+      min-height: 160px;
+    }
   `],
 })
-export class MatchDetailComponent implements OnInit {
+export class MatchDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly matchesService = inject(MatchesService);
   private readonly fb = inject(FormBuilder);
@@ -63,7 +90,14 @@ export class MatchDetailComponent implements OnInit {
     scoreAway: [0],
   });
 
+  editor: Editor | null = null;
+
+  readonly refereesForm = this.fb.nonNullable.group({
+    refereesInfo: [''],
+  });
+
   ngOnInit(): void {
+    this.editor = new Editor();
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
     this.matchesService.getById(id).subscribe((m) => {
@@ -78,8 +112,15 @@ export class MatchDetailComponent implements OnInit {
           scoreHome: m.scoreHome ?? 0,
           scoreAway: m.scoreAway ?? 0,
         });
+        this.refereesForm.patchValue({
+          refereesInfo: m.refereesInfo ?? '',
+        });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.editor?.destroy();
   }
 
   saveDetails(): void {
@@ -98,6 +139,16 @@ export class MatchDetailComponent implements OnInit {
     const v = this.scoreForm.getRawValue();
     this.matchesService.update(m._id, { scoreHome: v.scoreHome, scoreAway: v.scoreAway }).subscribe((updated) => {
       this.match.set(updated);
+    });
+  }
+
+  saveRefereesInfo(): void {
+    const m = this.match();
+    if (!m) return;
+    const v = this.refereesForm.getRawValue();
+    this.matchesService.update(m._id, { refereesInfo: v.refereesInfo }).subscribe((updated) => {
+      this.match.set(updated);
+      this.refereesForm.patchValue({ refereesInfo: updated.refereesInfo ?? '' });
     });
   }
 }

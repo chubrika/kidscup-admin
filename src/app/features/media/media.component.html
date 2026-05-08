@@ -1,34 +1,87 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Media</mat-card-title>
-    <mat-card-subtitle>Upload team and match photos</mat-card-subtitle>
+    <mat-card-title>ფოტოები</mat-card-title>
+    <mat-card-subtitle>აირჩიეთ სეზონი და ატვირთეთ ფოტოები</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <div class="upload-section">
       <mat-form-field appearance="outline">
-        <mat-label>Type</mat-label>
-        <mat-select [(value)]="uploadType">
-          <mat-option value="team">Team Photo</mat-option>
-          <mat-option value="match">Match Photo</mat-option>
+        <mat-label>სეზონი</mat-label>
+        <mat-select [(value)]="seasonId" (selectionChange)="onSeasonChanged()">
+          @for (s of seasons; track s._id) {
+            <mat-option [value]="s._id">{{ s.name }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
+
       <mat-form-field appearance="outline">
-        <mat-label>Entity ID (Team or Match ID)</mat-label>
-        <input matInput [(ngModel)]="entityId" placeholder="e.g. 1" />
+        <mat-label>ალბომი</mat-label>
+        <mat-select [(value)]="albumId">
+          @for (a of (seasonDetails?.albums ?? []); track a._id) {
+            <mat-option [value]="a._id">{{ a.title }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
-      <input type="file" accept="image/*" #fileInput (change)="onFileSelected($event)" style="display: none" />
-      <button mat-flat-button color="primary" (click)="fileInput.click()">
-        <mat-icon>upload</mat-icon>
-        Choose Image
+
+      <input type="file" accept="image/*" multiple #fileInput (change)="onFileSelected($event)" style="display: none" />
+      <button mat-flat-button color="primary" (click)="fileInput.click()" [disabled]="uploading()">
+        <mat-icon>upload</mat-icon> ფოტოების აირჩევა
+      </button>
+      <button mat-flat-button color="accent" (click)="upload()" [disabled]="uploading() || !seasonId || !albumId || selectedFiles().length === 0">
+        ფოტოების ატვირთვა
       </button>
     </div>
-    @if (selectedFile()) {
-      <p class="file-name">Selected: {{ selectedFile()!.name }}</p>
-      <button mat-button (click)="upload()">Upload</button>
-    }
-    <div class="placeholder-info">
-      <mat-icon>photo_library</mat-icon>
-      <p>Upload images for teams (logos, squad photos) and matches (action shots). Configure your backend to accept multipart/form-data at <code>/api/media/upload</code>.</p>
+
+    <div class="albums-header">
+      <mat-form-field appearance="outline">
+        <mat-label>ახალი ალბომის სახელი</mat-label>
+        <input matInput [(ngModel)]="newAlbumTitle" placeholder="მაგ: Team 1 10:35" />
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="createAlbum()" [disabled]="!seasonId || !newAlbumTitle.trim()">
+        <mat-icon>create_new_folder</mat-icon> ალბომის შექმნა
+      </button>
     </div>
+
+    @if ((seasonDetails?.albums ?? []).length > 0) {
+      <div class="albums-grid">
+        @for (a of seasonDetails!.albums!; track a._id) {
+          <mat-card class="album-card" [class.active]="a._id === albumId" (click)="selectAlbum(a._id)">
+            <mat-card-content>
+              <div class="album-title">{{ a.title }}</div>
+              <div class="album-sub">{{ (a.photos?.length ?? 0) }} photos</div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    } @else {
+      <div class="hint">No albums yet. Create one above.</div>
+    }
+
+    @if (selectedFiles().length > 0) {
+      <div class="files">
+        @for (f of selectedFiles(); track f.name) {
+          <div class="file-name">{{ f.name }}</div>
+        }
+      </div>
+    }
+
+    @if (progressText()) {
+      <div class="hint">{{ progressText() }}</div>
+    }
+
+    @if (errorText()) {
+      <div class="error">{{ errorText() }}</div>
+    }
+    @if (seasonDetails?.albums?.length) {
+      <div class="photos-grid">
+        @for (p of selectedAlbumPhotos; track p.key) {
+          <mat-card class="photo-card">
+            <img class="photo" [src]="p.url" alt="Album photo" loading="lazy" />
+          </mat-card>
+        }        
+      </div>
+    } @else {
+      <div class="hint">No photos yet.</div>
+    }
   </mat-card-content>
 </mat-card>

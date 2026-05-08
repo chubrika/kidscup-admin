@@ -1,35 +1,55 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay, catchError } from 'rxjs/operators';
+import { Observable, filter, map, switchMap, take } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
+import { UploadService } from '@app/core/services/upload.service';
+import { Season } from '@app/core/models/season.model';
 
-export interface MediaItem {
-  id: string;
+export interface UploadResult {
+  season: Season;
+  key: string;
   url: string;
-  type: 'team' | 'match';
-  entityId: string;
-  caption?: string;
-  createdAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class MediaService {
-  constructor(private readonly api: ApiService) {}
+  constructor(
+    private readonly api: ApiService,
+    private readonly upload: UploadService,
+  ) {}
 
-  getByType(type: 'team' | 'match', entityId?: string): Observable<MediaItem[]> {
-    const params: Record<string, string> = { type };
-    if (entityId) params['entityId'] = entityId;
-    return this.api.get<MediaItem[]>('/media', params).pipe(
-      delay(200),
-      catchError(() => of([])),
+  /**
+   * Uploads a file to Cloudflare (signed URL), then attaches it to a season in DB.
+   * Backend will move temp object into `seasons/<seasonId>/...` and persist the public URL.
+   */
+  uploadSeasonPhoto(seasonId: string, file: File): Observable<UploadResult> {
+    return this.upload.getUploadUrl(file.type).pipe(
+      switchMap(({ uploadUrl, key, fileUrl }) =>
+        this.upload.putToSignedUrl(uploadUrl, file).pipe(
+          filter((p) => p === 100),
+          take(1),
+          switchMap(() => this.api.post<Season>(`/seasons/${seasonId}/photos`, { key })),
+          map((season) => ({ season, key, url: fileUrl })),
+        ),
+      ),
     );
   }
 
-  upload(file: File, type: 'team' | 'match', entityId: string): Observable<MediaItem> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-    formData.append('entityId', entityId);
-    return this.api.post<MediaItem>('/media/upload', formData).pipe(delay(300));
+  uploadSeasonAlbumPhoto(seasonId: string, albumId: string, file: File): Observable<UploadResult> {
+    return this.upload.getUploadUrl(file.type).pipe(
+      switchMap(({ uploadUrl, key, fileUrl }) =>
+        this.upload.putToSignedUrl(uploadUrl, file).pipe(
+          filter((p) => p === 100),
+          take(1),
+          switchMap(() =>
+            this.api.post<Season>(`/seasons/${seasonId}/albums/${albumId}/photos`, { key }),
+          ),
+          map((season) => ({ season, key, url: fileUrl })),
+        ),
+      ),
+    );
+  }
+
+  createSeasonAlbum(seasonId: string, title: string): Observable<Season> {
+    return this.api.post<Season>(`/seasons/${seasonId}/albums`, { title });
   }
 }

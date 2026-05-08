@@ -107,6 +107,39 @@
               <app-live-scoring [match]="match()!"></app-live-scoring>
             </div>
           </mat-tab>
+
+          <mat-tab label="მსაჯები">
+            <div class="px-2 pb-5 pt-4 sm:px-4">
+              @if (editor) {
+                <form [formGroup]="refereesForm" (ngSubmit)="saveRefereesInfo()" class="grid grid-cols-1 gap-4">
+                  <div>
+                    <label class="match-editor-label">მსაჯების ინფორმაცია</label>
+                    <div class="match-editor-wrapper NgxEditor__Wrapper">
+                      <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                      <ngx-editor
+                        [editor]="editor"
+                        formControlName="refereesInfo"
+                        [placeholder]="'ჩაწერე მსაჯების ინფორმაცია...'"
+                        [outputFormat]="'html'"
+                      ></ngx-editor>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center justify-end gap-2">
+                    <button mat-stroked-button type="button" (click)="refereesForm.reset(refereesForm.getRawValue())">
+                      Reset
+                    </button>
+                    <button mat-flat-button color="primary" type="submit">
+                      <mat-icon>save</mat-icon>
+                      Save referees
+                    </button>
+                  </div>
+                </form>
+              } @else {
+                <div class="text-slate-600">Loading editor...</div>
+              }
+            </div>
+          </mat-tab>
         </mat-tab-group>
       </mat-card-content>
     </mat-card>
