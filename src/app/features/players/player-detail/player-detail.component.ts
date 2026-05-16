@@ -7,6 +7,7 @@ import { PlayersService } from '../players.service';
 import { Player } from '../../../core/models/player.model';
 import { PlayerFormDialogComponent } from '../players-list/player-form-dialog/player-form-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ImagePreviewDialogComponent } from './image-preview-dialog.component';
 
 @Component({
   selector: 'app-player-detail',
@@ -16,8 +17,32 @@ import { MatDialog } from '@angular/material/dialog';
   styles: [`
     .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .page-title { flex: 1; margin: 0; font-size: 1.5rem; }
-    .info-list { display: grid; grid-template-columns: auto 1fr; gap: 8px 24px; }
+    .info-list { display: grid; grid-template-columns: auto 1fr; gap: 8px 24px; align-items: start; }
     a { color: #2563eb; }
+    .thumb-btn {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .thumb-btn:hover .thumb-img { box-shadow: 0 0 0 2px #2563eb; }
+    .thumb-img {
+      display: block;
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    .thumb-hint {
+      font-size: 12px;
+      color: #6b7280;
+    }
   `],
 })
 export class PlayerDetailComponent implements OnInit {
@@ -36,6 +61,15 @@ export class PlayerDetailComponent implements OnInit {
   this.playerId.set(id);
   if (!id) return;
     this.playersService.getById(id).subscribe((p) => this.player.set(p ?? null));
+  }
+
+  openImagePreview(url: string | undefined, title: string): void {
+    if (!url) return;
+    this.dialog.open(ImagePreviewDialogComponent, {
+      maxWidth: '95vw',
+      panelClass: 'image-preview-dialog-panel',
+      data: { url, title },
+    });
   }
 
   openEditDialog(): void {

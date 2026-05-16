@@ -104,7 +104,10 @@ export class LiveScoringComponent implements OnInit {
     this.liveMatchService
       .addEvent(matchId, { playerId, teamId, type })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ stats }) => this.stats.set(stats));
+      .subscribe(({ event, stats }) => {
+        this.stats.set(stats);
+        this.timeline.update((events) => [event, ...events]);
+      });
   }
 
   undoLast(): void {
@@ -113,7 +116,10 @@ export class LiveScoringComponent implements OnInit {
     this.liveMatchService
       .deleteEvent(first._id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ stats }) => this.stats.set(stats));
+      .subscribe(({ stats }) => {
+        this.stats.set(stats);
+        this.timeline.update((events) => events.slice(1));
+      });
   }
 }
 

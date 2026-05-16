@@ -11,6 +11,8 @@ export interface Player {
   height?: number;
   photo?: string;
   photoKey?: string;
+  idDocument?: string;
+  idDocumentKey?: string;
   teamId: {
     _id: string;
     name: string;
@@ -31,6 +33,8 @@ export interface PlayerCreateDto {
   height?: number;
   photo?: string;
   photoKey?: string;
+  idDocument?: string;
+  idDocumentKey?: string;
   teamId: {
     _id: string;
     name: string;

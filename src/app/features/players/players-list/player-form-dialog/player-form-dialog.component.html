@@ -41,38 +41,61 @@
       </mat-select>
     </mat-form-field>
 
-    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <div style="width: 96px; height: 96px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.12); background: #fff; display: grid; place-items: center;">
+    <p class="upload-label">მოთამაშის ფოტო</p>
+    <div class="upload-block">
+      <div class="upload-preview">
         @if (previewUrl()) {
-          <img [src]="previewUrl()!" alt="Player photo preview" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+          <img [src]="previewUrl()!" alt="Player photo preview" />
         } @else {
-          <span style="font-size: 12px; color: #64748b;">No photo</span>
+          <span class="upload-hint">No photo</span>
         }
       </div>
-
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="uploading()">
+      <div class="upload-actions">
+        <button mat-stroked-button type="button" (click)="photoInput.click()" [disabled]="isUploading()">
           აირჩიე ფოტო
         </button>
-        <span style="font-size: 12px; color: #64748b;">JPG/PNG • max 2MB</span>
-        @if (uploading()) {
-          <span style="font-size: 12px; color: #64748b;">
-            Progress: {{ uploadProgress() ?? 0 }}%
-          </span>
+        <span class="upload-hint">JPG/PNG/WebP • max 4MB</span>
+        @if (uploadingPhoto()) {
+          <span class="upload-hint">Progress: {{ uploadProgress() ?? 0 }}%</span>
         }
       </div>
     </div>
+    <input #photoInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onPhotoSelected($event)" />
 
-    <input #fileInput type="file" accept="image/jpeg,image/png" hidden (change)="onFileSelected($event)" />
+    <p class="upload-label">პირადობა / დაბადების მოწმობის ფოტო</p>
+    <div class="upload-block">
+      <div class="upload-preview upload-preview--doc">
+        @if (idDocumentPreviewUrl()) {
+          <img [src]="idDocumentPreviewUrl()!" alt="ID document preview" />
+        } @else {
+          <span class="upload-hint">No document</span>
+        }
+      </div>
+      <div class="upload-actions">
+        <button mat-stroked-button type="button" (click)="idDocumentInput.click()" [disabled]="isUploading()">
+          აირჩიე დოკუმენტი
+        </button>
+        @if (idDocumentPreviewUrl()) {
+          <button mat-button type="button" (click)="clearIdDocument()" [disabled]="isUploading()">
+            წაშლა
+          </button>
+        }
+        <span class="upload-hint">JPG/PNG/WebP • max 4MB</span>
+        @if (uploadingIdDocument()) {
+          <span class="upload-hint">Progress: {{ uploadProgress() ?? 0 }}%</span>
+        }
+      </div>
+    </div>
+    <input #idDocumentInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onIdDocumentSelected($event)" />
 
     @if (uploadError()) {
-      <div style="color: #b91c1c; font-size: 0.875rem;">{{ uploadError() }}</div>
+      <div class="upload-error">{{ uploadError() }}</div>
     }
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="cancel()" [disabled]="uploading()">გაუქმება</button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || uploading()">
-      @if (uploading()) { იტვირთება... } @else { შენახვა }
+    <button mat-button type="button" (click)="cancel()" [disabled]="isUploading()">გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || isUploading()">
+      @if (isUploading()) { იტვირთება... } @else { შენახვა }
     </button>
   </mat-dialog-actions>
 </form>
