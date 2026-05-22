@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { StandingsService } from './standings.service';
 import { CategoriesService } from '../../core/services/categories.service';
-import { StandingRow, TeamStanding } from '../../core/models/standing.model';
+import { StandingsGroup } from '../../core/models/standing.model';
 import { Category } from '../../core/models/category.model';
 
 @Component({
@@ -25,7 +25,7 @@ import { Category } from '../../core/models/category.model';
 export class StandingsComponent implements OnInit {
   private readonly standingsService = inject(StandingsService);
   private readonly categoriesService = inject(CategoriesService);
-  readonly standings = signal<StandingRow[]>([]);
+  readonly standings = signal<StandingsGroup[]>([]);
   readonly categories = signal<Category[]>([]);
   readonly selectedCategory = signal<string>('');
   readonly displayedColumns = ['position', 'teamName', 'played', 'wins', 'losses', 'points'];

@@ -45,6 +45,8 @@ export class MatchesService {
       location: dto.location,
       ageCategory: dto.ageCategory || undefined,
       season: dto.seasonId || undefined,
+      group: dto.groupId || undefined,
+      round: dto.roundId || undefined,
       refereesInfo: dto.refereesInfo || undefined,
       status: dto.status,
       scoreHome: dto.scoreHome,
@@ -58,12 +60,14 @@ export class MatchesService {
 
   update(id: string, dto: Partial<MatchCreateDto>): Observable<Match> {
     // Keep PATCH payload consistent with CREATE payload (backend expects homeTeam/awayTeam/season keys).
-    const { seasonId, homeTeamId, awayTeamId, ...rest } = dto;
+    const { seasonId, groupId, roundId, homeTeamId, awayTeamId, ...rest } = dto;
     const body: Record<string, unknown> = {
       ...rest,
       ...(homeTeamId !== undefined && { homeTeam: homeTeamId }),
       ...(awayTeamId !== undefined && { awayTeam: awayTeamId }),
       ...(seasonId !== undefined && { season: seasonId }),
+      ...(groupId !== undefined && { group: groupId }),
+      ...(roundId !== undefined && { round: roundId }),
     };
     return this.api.patch<Match>(`/matches/${id}`, body).pipe(
       delay(200),

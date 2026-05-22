@@ -14,6 +14,10 @@ import { CategoriesService } from '@app/features/categories/categories.service';
 import { Category } from '@app/core/models/category.model';
 import { SeasonService } from '@app/core/services/season.service';
 import { Season } from '@app/core/models/season.model';
+import { GroupsService } from '@app/features/groups/groups.service';
+import { Group } from '@app/core/models/group.model';
+import { RoundsService } from '@app/features/rounds/rounds.service';
+import { Round } from '@app/core/models/round.model';
 
 @Component({
   selector: 'app-match-form-dialog',
@@ -55,6 +59,7 @@ import { Season } from '@app/core/models/season.model';
     .match-editor-wrapper ::ng-deep .NgxEditor__Content {
       min-height: 120px;
     }
+    .hint { font-size: 0.75rem; color: rgba(0,0,0,0.6); margin: 0; }
   `],
 })
 export class MatchFormDialogComponent implements OnInit, OnDestroy {
@@ -63,10 +68,15 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
   private readonly teamsService = inject(TeamsService);
   private readonly categoriesService = inject(CategoriesService);
   private readonly seasonService = inject(SeasonService);
+  private readonly groupsService = inject(GroupsService);
+  private readonly roundsService = inject(RoundsService);
   readonly data = inject<Match | null>(MAT_DIALOG_DATA, { optional: true });
-  readonly teams = signal<Team[]>([]);
+  readonly allTeams = signal<Team[]>([]);
+  readonly filteredTeams = signal<Team[]>([]);
   readonly categories = signal<Category[]>([]);
   readonly seasons = signal<Season[]>([]);
+  readonly groups = signal<Group[]>([]);
+  readonly rounds = signal<Round[]>([]);
 
   editor: Editor | null = null;
 
@@ -79,12 +89,28 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
 
   private get initialSeasonId(): string {
     const s = (this.data as Match & { season?: Season | string })?.season;
-    if (s == null) return '';
+    if (s == null) return this.data?.seasonId ?? '';
     if (typeof s === 'object') return (s as Season)._id ?? '';
     return String(s);
   }
 
+  private get initialGroupId(): string {
+    const g = this.data?.group ?? this.data?.groupId;
+    if (g == null) return '';
+    if (typeof g === 'object') return g._id ?? '';
+    return String(g);
+  }
+
+  private get initialRoundId(): string {
+    const r = this.data?.round ?? this.data?.roundId;
+    if (r == null) return '';
+    if (typeof r === 'object') return r._id ?? '';
+    return String(r);
+  }
+
   readonly form = this.fb.nonNullable.group({
+    groupId: [this.initialGroupId, Validators.required],
+    roundId: [this.initialRoundId],
     homeTeamId: [this.data?.homeTeamId ?? '', Validators.required],
     awayTeamId: [this.data?.awayTeamId ?? '', Validators.required],
     date: [this.data?.date ?? '', Validators.required],
@@ -100,13 +126,38 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editor = new Editor();
-    this.teamsService.getAll().subscribe((t) => this.teams.set(t));
+    this.teamsService.getAll().subscribe((t) => {
+      this.allTeams.set(t);
+      this.applyTeamFilter();
+    });
     this.categoriesService.getAll().subscribe((c) => this.categories.set(c));
     const catId = this.form.getRawValue().ageCategory;
+    const seasonId = this.form.getRawValue().seasonId;
     if (catId) this.loadSeasonsByCategory(catId);
+    if (seasonId) this.loadGroupsBySeason(seasonId);
+    const groupId = this.form.getRawValue().groupId;
+    if (groupId) this.loadRoundsByGroup(groupId);
+
     this.form.get('ageCategory')?.valueChanges.subscribe((id) => {
-      this.form.patchValue({ seasonId: '' });
-      if (id) this.loadSeasonsByCategory(id); else this.seasons.set([]);
+      this.form.patchValue({ seasonId: '', groupId: '', roundId: '', homeTeamId: '', awayTeamId: '' });
+      if (id) this.loadSeasonsByCategory(id);
+      else this.seasons.set([]);
+      this.groups.set([]);
+      this.rounds.set([]);
+      this.applyTeamFilter();
+    });
+    this.form.get('seasonId')?.valueChanges.subscribe((id) => {
+      this.form.patchValue({ groupId: '', roundId: '', homeTeamId: '', awayTeamId: '' });
+      if (id) this.loadGroupsBySeason(id);
+      else this.groups.set([]);
+      this.rounds.set([]);
+      this.applyTeamFilter();
+    });
+    this.form.get('groupId')?.valueChanges.subscribe((id) => {
+      this.form.patchValue({ roundId: '', homeTeamId: '', awayTeamId: '' });
+      if (id) this.loadRoundsByGroup(id);
+      else this.rounds.set([]);
+      this.applyTeamFilter();
     });
   }
 
@@ -118,6 +169,48 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
     this.seasonService.getSeasons({ ageCategory: ageCategoryId }).subscribe((list) => this.seasons.set(list));
   }
 
+  private loadGroupsBySeason(seasonId: string): void {
+    const ageCategory = this.form.getRawValue().ageCategory;
+    this.groupsService.getAll({ seasonId, ageCategory: ageCategory || undefined }).subscribe((list) => this.groups.set(list));
+  }
+
+  private loadRoundsByGroup(groupId: string): void {
+    this.roundsService.getAll(groupId).subscribe((list) => this.rounds.set(list));
+  }
+
+  private teamGroupId(team: Team): string {
+    const g = team.group;
+    if (!g) return '';
+    return typeof g === 'string' ? g : g._id;
+  }
+
+  private applyTeamFilter(): void {
+    const { groupId, ageCategory, seasonId } = this.form.getRawValue();
+    let list = this.allTeams();
+    if (ageCategory) {
+      list = list.filter((t) => {
+        const ac = t.ageCategory;
+        const id = typeof ac === 'string' ? ac : ac?._id;
+        return id === ageCategory;
+      });
+    }
+    if (seasonId) {
+      list = list.filter((t) => {
+        const s = t.season;
+        if (!s) return true;
+        const id = typeof s === 'string' ? s : s._id;
+        return id === seasonId;
+      });
+    }
+    if (groupId) {
+      list = list.filter((t) => {
+        const gid = this.teamGroupId(t);
+        return !gid || gid === groupId;
+      });
+    }
+    this.filteredTeams.set(list);
+  }
+
   teamId(team: Team): string {
     return (team as { id?: string; _id: string }).id ?? team._id;
   }
@@ -125,6 +218,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
   submit(): void {
     if (this.form.invalid) return;
     const v = this.form.getRawValue();
+    if (v.homeTeamId === v.awayTeamId) return;
     const dto: MatchCreateDto & { id?: string } = {
       homeTeamId: v.homeTeamId,
       awayTeamId: v.awayTeamId,
@@ -133,6 +227,8 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
       location: v.location,
       ageCategory: v.ageCategory,
       seasonId: v.seasonId,
+      groupId: v.groupId,
+      roundId: v.roundId || undefined,
       refereesInfo: v.refereesInfo,
       status: v.status,
       scoreHome: v.scoreHome,

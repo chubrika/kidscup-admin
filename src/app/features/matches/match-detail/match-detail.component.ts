@@ -82,6 +82,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   readonly detailsForm = this.fb.nonNullable.group({
     date: ['', Validators.required],
     time: ['', Validators.required],
+    location: ['', Validators.required],
     status: ['scheduled' as MatchStatus, Validators.required],
   });
 
@@ -103,11 +104,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     this.matchesService.getById(id).subscribe((m) => {
       if (m) {
         this.match.set(m);
-        this.detailsForm.patchValue({
-          date: m.date ?? '',
-          time: m.time ?? '',
-          status: (m.status ?? 'scheduled') as MatchStatus,
-        });
+        this.patchDetailsForm(m);
         this.scoreForm.patchValue({
           scoreHome: m.scoreHome ?? 0,
           scoreAway: m.scoreAway ?? 0,
@@ -119,6 +116,31 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  private patchDetailsForm(m: Match): void {
+    this.detailsForm.patchValue({
+      date: this.toDateInputValue(m.date),
+      time: this.toTimeInputValue(m.time),
+      location: m.location ?? '',
+      status: (m.status ?? 'scheduled') as MatchStatus,
+    });
+  }
+
+  /** HTML date inputs require YYYY-MM-DD; API returns ISO Date strings. */
+  private toDateInputValue(date: string | undefined): string {
+    if (!date) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const d = new Date(date);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  }
+
+  private toTimeInputValue(time: string | undefined): string {
+    if (!time) return '';
+    const m = time.match(/^(\d{1,2}):(\d{2})/);
+    if (!m) return '';
+    return `${m[1].padStart(2, '0')}:${m[2]}`;
+  }
+
   ngOnDestroy(): void {
     this.editor?.destroy();
   }
@@ -128,9 +150,17 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     if (!m) return;
     if (this.detailsForm.invalid) return;
     const v = this.detailsForm.getRawValue();
-    this.matchesService.update(m._id, { date: v.date, time: v.time, status: v.status }).subscribe((updated) => {
-      this.match.set(updated);
-    });
+    this.matchesService
+      .update(m._id, {
+        date: v.date ? new Date(v.date).toISOString() : undefined,
+        time: v.time,
+        location: v.location,
+        status: v.status,
+      })
+      .subscribe((updated) => {
+        this.match.set(updated);
+        this.patchDetailsForm(updated);
+      });
   }
 
   saveScore(): void {

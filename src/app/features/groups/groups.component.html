@@ -1,0 +1,48 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>ჯგუფები</mat-card-title>
+    <div class="filters">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>სეზონი</mat-label>
+        <mat-select [value]="selectedSeasonId" (selectionChange)="onSeasonChange($event.value)">
+          @for (s of seasons; track s._id) {
+            <mat-option [value]="s._id">{{ s.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        ახალი ჯგუფი
+      </button>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="dataSource" class="full-width">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>სახელი</th>
+        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="season">
+        <th mat-header-cell *matHeaderCellDef>სეზონი</th>
+        <td mat-cell *matCellDef="let row">{{ seasonName(row) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="sortOrder">
+        <th mat-header-cell *matHeaderCellDef>რიგი</th>
+        <td mat-cell *matCellDef="let row">{{ row.sortOrder ?? 0 }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button (click)="openEditDialog(row)" aria-label="რედაქტირება">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="confirmDelete(row)" aria-label="წაშლა">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

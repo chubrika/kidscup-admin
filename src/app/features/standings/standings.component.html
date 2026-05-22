@@ -12,8 +12,8 @@
     </mat-form-field>
   </mat-card-header>
   <mat-card-content>
-    @for (categoryGroup of standings(); track categoryGroup.categoryId) {
-      <h3 class="category-title">{{ categoryGroup.categoryName }}</h3>
+    @for (categoryGroup of standings(); track categoryGroup.groupId ?? categoryGroup.categoryId) {
+      <h3 class="category-title">{{ categoryGroup.groupName ?? categoryGroup.categoryName }}</h3>
       <table mat-table [dataSource]="categoryGroup.standings" class="full-width">
         <ng-container matColumnDef="position">
           <th mat-header-cell *matHeaderCellDef>#</th>

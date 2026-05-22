@@ -33,7 +33,7 @@
         <mat-tab-group mat-stretch-tabs="false" class="px-2 sm:px-4">
           <mat-tab label="Match details">
             <div class="px-2 pb-5 pt-4 sm:px-4">
-              <form [formGroup]="detailsForm" (ngSubmit)="saveDetails()" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <form [formGroup]="detailsForm" (ngSubmit)="saveDetails()" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <mat-form-field appearance="outline">
                   <mat-label>თარიღი</mat-label>
                   <input matInput type="date" formControlName="date" />
@@ -41,6 +41,10 @@
                 <mat-form-field appearance="outline">
                   <mat-label>დრო</mat-label>
                   <input matInput type="time" formControlName="time" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>მდებარეობა</mat-label>
+                  <input matInput formControlName="location" />
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Status</mat-label>
@@ -51,7 +55,7 @@
                   </mat-select>
                 </mat-form-field>
 
-                <div class="sm:col-span-3 flex flex-wrap items-center justify-end gap-2">
+                <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center justify-end gap-2">
                   <button mat-stroked-button type="button" (click)="detailsForm.reset(detailsForm.getRawValue())">
                     Reset
                   </button>

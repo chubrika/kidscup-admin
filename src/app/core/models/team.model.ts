@@ -12,6 +12,8 @@ export interface Team {
   ageCategory: { _id: string; name?: string };
   /** Season ID (string) or populated season object from API */
   season?: { _id: string; name?: string };
+  /** Group ID (string) or populated group object from API */
+  group?: { _id: string; name?: string } | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -26,4 +28,6 @@ export interface TeamCreateDto {
   ageCategory?: string;
   /** Season ID (MongoDB ObjectId string) */
   season?: string;
+  /** Group ID (MongoDB ObjectId string) */
+  group?: string;
 }

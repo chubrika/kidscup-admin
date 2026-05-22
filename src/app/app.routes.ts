@@ -16,6 +16,8 @@ export const routes: Routes = [
       { path: 'standings', loadChildren: () => import('./features/standings/standings.routes').then(m => m.standingsRoutes) },
       { path: 'seasons', loadChildren: () => import('./features/seasons/seasons.routes').then(m => m.seasonsRoutes) },
       { path: 'categories', loadChildren: () => import('./features/categories/categories.routes').then(m => m.categoriesRoutes) },
+      { path: 'groups', loadChildren: () => import('./features/groups/groups.routes').then(m => m.groupsRoutes) },
+      { path: 'rounds', loadChildren: () => import('./features/rounds/rounds.routes').then(m => m.roundsRoutes) },
       { path: 'media', loadChildren: () => import('./features/media/media.routes').then(m => m.mediaRoutes) },
       { path: 'news', loadChildren: () => import('./features/news/news.routes').then(m => m.newsRoutes) },
     ],

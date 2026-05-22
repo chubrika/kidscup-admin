@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ data ? 'ჯგუფის რედაქტირება' : 'ახალი ჯგუფი' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>სახელი</mat-label>
+      <input matInput formControlName="name" placeholder="მაგ: A ჯგუფი" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>სეზონი</mat-label>
+      <mat-select formControlName="season">
+        @for (s of seasons; track s._id) {
+          <mat-option [value]="s._id">{{ s.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>ასაკობრივი კატეგორია</mat-label>
+      <mat-select formControlName="ageCategory">
+        <mat-option value="">—</mat-option>
+        @for (c of categories; track c._id) {
+          <mat-option [value]="c._id">{{ c.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>რიგი (sort)</mat-label>
+      <input matInput type="number" formControlName="sortOrder" min="0" />
+    </mat-form-field>
+    <p class="hint">8-გუნდიან ჯგუფში: 7 თამაში გუნდზე, 28 თამაში ჯგუფში, ტურში ~4 თამაში.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">შენახვა</button>
+  </mat-dialog-actions>
+</form>

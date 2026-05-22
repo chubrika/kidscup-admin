@@ -11,6 +11,8 @@ import { Category } from '../../../core/models/category.model';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { Season } from '../../../core/models/season.model';
 import { SeasonService } from '../../../core/services/season.service';
+import { GroupsService } from '../../groups/groups.service';
+import { Group } from '../../../core/models/group.model';
 import { UploadService } from '../../../core/services/upload.service';
 import { Subject, catchError, finalize, last, of, switchMap, takeUntil, tap } from 'rxjs';
 
@@ -40,11 +42,13 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
   private readonly ref = inject(MatDialogRef<TeamFormDialogComponent>);
   private readonly categoriesService = inject(CategoriesService);
   private readonly seasonService = inject(SeasonService);
+  private readonly groupsService = inject(GroupsService);
   private readonly uploadService = inject(UploadService);
   readonly data = inject<Team | null>(MAT_DIALOG_DATA, { optional: true });
 
   categories: Category[] = [];
   seasons: Season[] = [];
+  groups: Group[] = [];
 
   readonly uploading = signal(false);
   readonly uploadProgress = signal<number | null>(null);
@@ -59,6 +63,7 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
     coachName: [this.data?.coachName ?? '', Validators.required],
     ageCategory: [this.getAgeCategoryId(this.data) ?? '', Validators.required],
     season: [this.getSeasonId(this.data) ?? ''],
+    group: [this.getGroupId(this.data) ?? ''],
     logo: [this.data?.logo ?? ''],
     logoKey: [this.data?.logoKey ?? ''],
   });
@@ -87,14 +92,34 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
           this.seasons = list;
           const currentSeason = this.form.get('season')?.value;
           const currentId = currentSeason != null && currentSeason !== '' ? String(currentSeason) : '';
-          if (currentId && list.some((s) => s._id === currentId)) return;
-          this.form.patchValue({ season: list[0]?._id ?? '' }, { emitEvent: false });
+          if (currentId && list.some((s) => s._id === currentId)) {
+            this.loadGroupsForSeason(currentId);
+            return;
+          }
+          const nextSeason = list[0]?._id ?? '';
+          this.form.patchValue({ season: nextSeason }, { emitEvent: false });
+          if (nextSeason) this.loadGroupsForSeason(nextSeason);
         });
+      });
+
+    this.form
+      .get('season')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((seasonId) => {
+        const sid = seasonId != null && seasonId !== '' ? String(seasonId) : '';
+        if (sid && /^[a-fA-F0-9]{24}$/.test(sid)) {
+          this.loadGroupsForSeason(sid);
+        } else {
+          this.groups = [];
+          this.form.patchValue({ group: '' }, { emitEvent: false });
+        }
       });
 
     // Trigger initial seasons load (for edit and initial create)
     const initialCategory = this.form.get('ageCategory')?.value;
     if (initialCategory) this.form.patchValue({ ageCategory: initialCategory });
+    const initialSeason = this.getSeasonId(this.data);
+    if (initialSeason) this.loadGroupsForSeason(initialSeason);
 
     // Cleanup temp upload on cancel/backdrop/escape
     this.ref.beforeClosed().pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -116,6 +141,24 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
       return /^[a-fA-F0-9]{24}$/.test(ac) ? ac : null;
     }
     return (ac as { _id?: string })._id ?? null;
+  }
+
+  private loadGroupsForSeason(seasonId: string): void {
+    const ageCategory = this.form.get('ageCategory')?.value;
+    const catId = ageCategory != null && ageCategory !== '' ? String(ageCategory) : undefined;
+    this.groupsService.getAll({ seasonId, ageCategory: catId }).subscribe((list) => {
+      this.groups = list;
+      const current = this.form.get('group')?.value;
+      const currentId = current != null && current !== '' ? String(current) : '';
+      if (currentId && list.some((g) => g._id === currentId)) return;
+    });
+  }
+
+  private getGroupId(team: Team | null | undefined): string | null {
+    const group = team?.group;
+    if (!group) return null;
+    if (typeof group === 'string') return /^[a-fA-F0-9]{24}$/.test(group) ? group : null;
+    return (group as { _id?: string })._id ?? null;
   }
 
   private getSeasonId(team: Team | null | undefined): string | null {
@@ -209,6 +252,7 @@ export class TeamFormDialogComponent implements OnInit, OnDestroy {
       coachName: value.coachName,
       ageCategory: ageCategoryValue,
       season: seasonValue,
+      group: value.group && /^[a-fA-F0-9]{24}$/.test(String(value.group)) ? String(value.group) : undefined,
       logo: value.logo || undefined,
       logoKey: value.logoKey || undefined,
     };

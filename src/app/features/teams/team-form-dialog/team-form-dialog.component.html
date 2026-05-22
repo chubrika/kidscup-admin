@@ -30,6 +30,15 @@
         }
       </mat-select>
     </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>ჯგუფი</mat-label>
+      <mat-select formControlName="group">
+        <mat-option [value]="''">—</mat-option>
+        @for (g of groups; track g._id) {
+          <mat-option [value]="g._id">{{ g.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
     <div class="upload-row">
       <div class="preview">
         @if (previewUrl()) {

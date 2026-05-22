@@ -14,6 +14,11 @@ export interface Match {
   time: string;
   location: string;
   ageCategory: Category;
+  seasonId?: string;
+  groupId?: string;
+  roundId?: string;
+  group?: { _id: string; name?: string };
+  round?: { _id: string; name?: string };
   refereesInfo?: string;
   status: MatchStatus;
   scoreHome?: number;
@@ -30,6 +35,8 @@ export interface MatchCreateDto {
   location: string;
   ageCategory: string;
   seasonId?: string;
+  groupId?: string;
+  roundId?: string;
   refereesInfo?: string;
   status: MatchStatus;
   scoreHome?: number;

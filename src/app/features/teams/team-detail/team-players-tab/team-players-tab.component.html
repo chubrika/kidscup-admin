@@ -8,7 +8,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>სახელი</th>
         <td mat-cell *matCellDef="let row">
-          <a [routerLink]="['/players', row.id]">{{ row.firstName }} {{ row.lastName }}</a>
+          <a [routerLink]="['/players', row._id]">{{ row.firstName }} {{ row.lastName }}</a>
         </td>
       </ng-container>
       <ng-container matColumnDef="position">

@@ -2,9 +2,43 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline">
+      <mat-label>ჩემპიონატი</mat-label>
+      <mat-select formControlName="ageCategory">
+        @for (cat of categories(); track cat._id) {
+          <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>სეზონი</mat-label>
+      <mat-select formControlName="seasonId">
+        @for (s of seasons(); track s._id) {
+          <mat-option [value]="s._id">{{ s.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>ჯგუფი</mat-label>
+      <mat-select formControlName="groupId">
+        @for (g of groups(); track g._id) {
+          <mat-option [value]="g._id">{{ g.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>ტური</mat-label>
+      <mat-select formControlName="roundId">
+        <mat-option value="">—</mat-option>
+        @for (r of rounds(); track r._id) {
+          <mat-option [value]="r._id">{{ r.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <p class="hint">ორივე გუნდი იმავე ჯგუფიდან უნდა იყოს. ტურში ჯგუფში ~4 თამაშია (8 გუნდი × 7 ტური).</p>
+    <mat-form-field appearance="outline">
       <mat-label>Home </mat-label>
       <mat-select formControlName="homeTeamId">
-        @for (t of teams(); track teamId(t)) {
+        @for (t of filteredTeams(); track teamId(t)) {
           <mat-option [value]="teamId(t)">{{ t.name }}</mat-option>
         }
       </mat-select>
@@ -12,7 +46,7 @@
     <mat-form-field appearance="outline">
       <mat-label>Away </mat-label>
       <mat-select formControlName="awayTeamId">
-        @for (t of teams(); track teamId(t)) {
+        @for (t of filteredTeams(); track teamId(t)) {
           <mat-option [value]="teamId(t)">{{ t.name }}</mat-option>
         }
       </mat-select>
@@ -28,22 +62,6 @@
     <mat-form-field appearance="outline">
       <mat-label>მდებარეობა</mat-label>
       <input matInput formControlName="location" />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>ჩემპიონატი</mat-label>
-      <mat-select formControlName="ageCategory">
-        @for (cat of categories(); track cat._id) {
-          <mat-option [value]="cat._id">{{ cat.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>სეზონი</mat-label>
-      <mat-select formControlName="seasonId">
-        @for (s of seasons(); track s._id) {
-          <mat-option [value]="s._id">{{ s.name }}</mat-option>
-        }
-      </mat-select>
     </mat-form-field>
     @if (editor) {
       <div>

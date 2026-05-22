@@ -1,8 +1,15 @@
-export interface StandingRow {
-  _id: string;
-  categoryId: string; 
-  categoryName: string;
+export interface StandingsGroup {
+  categoryId?: string;
+  categoryName?: string;
+  groupId?: string | null;
+  groupName?: string;
+  sortOrder?: number;
   standings: TeamStanding[];
+}
+
+/** @deprecated Use StandingsGroup — kept for compatibility */
+export interface StandingRow extends StandingsGroup {
+  _id?: string;
 }
 
 export interface TeamStanding {
