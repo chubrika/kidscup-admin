@@ -113,6 +113,7 @@ export class AdminLayoutComponent {
     { label: 'სეზონები', route: '/seasons', icon: 'date_range' },
     { label: 'ტურნირები', route: '/categories', icon: 'category' },
     { label: 'ფოტოები', route: '/media', icon: 'photo_library' },
+    { label: 'ვიდეოები', route: '/videos', icon: 'videocam' },
     { label: 'სიახლეები', route: '/news', icon: 'newspaper' },
   ];
 }

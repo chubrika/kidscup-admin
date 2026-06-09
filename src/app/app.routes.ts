@@ -20,6 +20,7 @@ export const routes: Routes = [
       { path: 'rounds', loadChildren: () => import('./features/rounds/rounds.routes').then(m => m.roundsRoutes) },
       { path: 'media', loadChildren: () => import('./features/media/media.routes').then(m => m.mediaRoutes) },
       { path: 'news', loadChildren: () => import('./features/news/news.routes').then(m => m.newsRoutes) },
+      { path: 'videos', loadChildren: () => import('./features/videos/videos.routes').then(m => m.videosRoutes) },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

@@ -1,0 +1,86 @@
+<h2 mat-dialog-title>{{ data ? 'ვიდეოს რედაქტირება' : 'ახალი ვიდეო' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="video-form">
+  <mat-dialog-content class="video-dialog-content">
+    <mat-form-field appearance="outline" class="video-field">
+      <mat-label>სათაური</mat-label>
+      <input matInput formControlName="title" placeholder="ვიდეოს სათაური" />
+      @if (form.controls.title.touched && form.controls.title.hasError('required')) {
+        <mat-error>სათაური სავალდებულოა</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="video-field">
+      <mat-label>აღწერა</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        rows="4"
+        placeholder="მოკლე აღწერა (არასავალდებულო)"
+      ></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="video-field">
+      <mat-label>YouTube ბმული ან ID</mat-label>
+      <input
+        matInput
+        formControlName="youtubeUrl"
+        placeholder="https://www.youtube.com/watch?v=... ან dQw4w9WgXcQ"
+      />
+      @if (form.controls.youtubeUrl.touched && form.controls.youtubeUrl.hasError('required')) {
+        <mat-error>YouTube ბმული სავალდებულოა</mat-error>
+      }
+      @if (form.controls.youtubeUrl.touched && form.controls.youtubeUrl.hasError('invalidYoutube')) {
+        <mat-error>შეიყვანეთ სწორი YouTube ბმული ან 11-სიმბოლოიანი ID</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="youtube-preview">
+      <div class="youtube-preview__frame">
+        @if (thumbnailUrl()) {
+          <img
+            class="youtube-preview__image"
+            [src]="thumbnailUrl()!"
+            alt="YouTube thumbnail preview"
+            (error)="onThumbnailError()"
+          />
+        } @else {
+          <span class="youtube-preview__placeholder">
+            ჩასვით YouTube ბმული ან ID პრევიუს სანახავად
+          </span>
+        }
+      </div>
+
+      @if (previewVideoId()) {
+        <div class="youtube-preview__meta">
+          <span style="font-size: 0.75rem; color: #64748b;">შენახული ID</span>
+          <span class="youtube-preview__id">{{ previewVideoId() }}</span>
+        </div>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="video-field">
+      <mat-label>კატეგორია</mat-label>
+      <mat-select formControlName="category">
+        @for (category of categories; track category) {
+          <mat-option [value]="category">{{ category }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="video-field">
+      <mat-label>სტატუსი</mat-label>
+      <mat-select formControlName="status">
+        @for (status of statuses; track status.value) {
+          <mat-option [value]="status.value">{{ status.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>გაუქმება</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+      შენახვა
+    </button>
+  </mat-dialog-actions>
+</form>
