@@ -48,7 +48,7 @@
           <mat-card class="album-card" [class.active]="a._id === albumId" (click)="selectAlbum(a._id)">
             <mat-card-content>
               <div class="album-title">{{ a.title }}</div>
-              <div class="album-sub">{{ (a.photos?.length ?? 0) }} photos</div>
+              <div class="album-sub">{{ (a.photos) }} photos</div>
             </mat-card-content>
           </mat-card>
         }
