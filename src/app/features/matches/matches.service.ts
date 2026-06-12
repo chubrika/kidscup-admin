@@ -47,6 +47,7 @@ export class MatchesService {
       season: dto.seasonId || undefined,
       group: dto.groupId || undefined,
       round: dto.roundId || undefined,
+      stage: dto.stage || undefined,
       refereesInfo: dto.refereesInfo || undefined,
       status: dto.status,
       scoreHome: dto.scoreHome,

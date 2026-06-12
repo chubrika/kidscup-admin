@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { MatchesService } from '../matches.service';
 import { Match, MatchStatus } from '../../../core/models/match.model';
+import { MATCH_STAGE_LABELS, resolveMatchStage } from '../../../core/models/match-stage';
 import { MatchFormDialogComponent } from './match-form-dialog/match-form-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -41,7 +42,7 @@ export class MatchesListComponent implements OnInit {
   private readonly matchesService = inject(MatchesService);
   private readonly dialog = inject(MatDialog);
   readonly dataSource = new MatTableDataSource<Match>([]);
-  readonly displayedColumns = ['date', 'match', 'location', 'status', 'score', 'actions'];
+  readonly displayedColumns = ['date', 'match', 'stage', 'location', 'status', 'score', 'actions'];
 
   ngOnInit(): void {
     this.matchesService.getAll().subscribe((list) => (this.dataSource.data = list));
@@ -88,6 +89,10 @@ export class MatchesListComponent implements OnInit {
 
   formatDateGeorgian(date: string): string {
     return new Date(date).toLocaleDateString('ka-GE');
+  }
+
+  stageLabel(stage: Match['stage']): string {
+    return MATCH_STAGE_LABELS[resolveMatchStage(stage)];
   }
   private refresh(): void {
     this.matchesService.getAll().subscribe((list) => (this.dataSource.data = list));

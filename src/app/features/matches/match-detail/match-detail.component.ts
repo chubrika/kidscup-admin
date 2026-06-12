@@ -11,6 +11,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Editor, NgxEditorComponent, NgxEditorMenuComponent } from 'ngx-editor';
 import { MatchesService } from '../matches.service';
 import { Match, MatchStatus } from '../../../core/models/match.model';
+import {
+  MATCH_STAGE_LABELS,
+  MATCH_STAGE_OPTIONS,
+  resolveMatchStage,
+  type MatchStage,
+} from '../../../core/models/match-stage';
 import { LiveScoringComponent } from '../live-scoring/live-scoring.component';
 
 @Component({
@@ -71,6 +77,12 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
   readonly router = inject(Router);
   readonly match = signal<Match | null>(null);
 
+  readonly stageOptions = MATCH_STAGE_OPTIONS;
+
+  stageLabel(stage: Match['stage']): string {
+    return MATCH_STAGE_LABELS[resolveMatchStage(stage)];
+  }
+
   readonly statusOptions: { value: MatchStatus; label: string }[] = [
     { value: 'scheduled', label: 'დაგეგმილი' },
     { value: 'live', label: 'Live' },
@@ -83,6 +95,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
     date: ['', Validators.required],
     time: ['', Validators.required],
     location: ['', Validators.required],
+    stage: ['GROUP' as MatchStage, Validators.required],
     status: ['scheduled' as MatchStatus, Validators.required],
   });
 
@@ -121,6 +134,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
       date: this.toDateInputValue(m.date),
       time: this.toTimeInputValue(m.time),
       location: m.location ?? '',
+      stage: resolveMatchStage(m.stage),
       status: (m.status ?? 'scheduled') as MatchStatus,
     });
   }
@@ -155,6 +169,7 @@ export class MatchDetailComponent implements OnInit, OnDestroy {
         date: v.date ? new Date(v.date).toISOString() : undefined,
         time: v.time,
         location: v.location,
+        stage: v.stage,
         status: v.status,
       })
       .subscribe((updated) => {

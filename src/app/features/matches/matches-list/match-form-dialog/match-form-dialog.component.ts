@@ -8,6 +8,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { Editor, NgxEditorComponent, NgxEditorMenuComponent } from 'ngx-editor';
 import { Match, MatchCreateDto, MatchStatus } from '@app/core/models/match.model';
+import {
+  DEFAULT_MATCH_STAGE,
+  isGroupStage,
+  MATCH_STAGE_OPTIONS,
+  resolveMatchStage,
+  type MatchStage,
+} from '@app/core/models/match-stage';
 import { TeamsService } from '@app/features/teams/teams.service';
 import { Team } from '@app/core/models/team.model';
 import { CategoriesService } from '@app/features/categories/categories.service';
@@ -71,6 +78,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
   private readonly groupsService = inject(GroupsService);
   private readonly roundsService = inject(RoundsService);
   readonly data = inject<Match | null>(MAT_DIALOG_DATA, { optional: true });
+  readonly stageOptions = MATCH_STAGE_OPTIONS;
   readonly allTeams = signal<Team[]>([]);
   readonly filteredTeams = signal<Team[]>([]);
   readonly categories = signal<Category[]>([]);
@@ -109,7 +117,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
   }
 
   readonly form = this.fb.nonNullable.group({
-    groupId: [this.initialGroupId, Validators.required],
+    groupId: [this.initialGroupId],
     roundId: [this.initialRoundId],
     homeTeamId: [this.data?.homeTeamId ?? '', Validators.required],
     awayTeamId: [this.data?.awayTeamId ?? '', Validators.required],
@@ -118,6 +126,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
     location: [this.data?.location ?? '', Validators.required],
     ageCategory: [this.initialCategoryId, Validators.required],
     seasonId: [this.initialSeasonId, Validators.required],
+    stage: [resolveMatchStage(this.data?.stage) ?? DEFAULT_MATCH_STAGE, Validators.required],
     refereesInfo: [this.data?.refereesInfo ?? ''],
     status: [this.data?.status ?? 'scheduled' as MatchStatus, Validators.required],
     scoreHome: [this.data?.scoreHome ?? 0],
@@ -159,6 +168,29 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
       else this.rounds.set([]);
       this.applyTeamFilter();
     });
+    this.form.get('stage')?.valueChanges.subscribe((stage) => {
+      this.applyStageRules(stage as MatchStage);
+    });
+    this.applyStageRules(this.form.getRawValue().stage);
+  }
+
+  isGroupStageSelected(): boolean {
+    return isGroupStage(this.form.getRawValue().stage);
+  }
+
+  private applyStageRules(stage: MatchStage): void {
+    const groupControl = this.form.get('groupId');
+    if (!groupControl) return;
+
+    if (isGroupStage(stage)) {
+      groupControl.setValidators(Validators.required);
+    } else {
+      groupControl.clearValidators();
+      this.form.patchValue({ groupId: '', roundId: '', homeTeamId: '', awayTeamId: '' });
+      this.rounds.set([]);
+    }
+    groupControl.updateValueAndValidity();
+    this.applyTeamFilter();
   }
 
   ngOnDestroy(): void {
@@ -185,7 +217,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
   }
 
   private applyTeamFilter(): void {
-    const { groupId, ageCategory, seasonId } = this.form.getRawValue();
+    const { groupId, ageCategory, seasonId, stage } = this.form.getRawValue();
     let list = this.allTeams();
     if (ageCategory) {
       list = list.filter((t) => {
@@ -202,7 +234,7 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
         return id === seasonId;
       });
     }
-    if (groupId) {
+    if (isGroupStage(stage) && groupId) {
       list = list.filter((t) => {
         const gid = this.teamGroupId(t);
         return !gid || gid === groupId;
@@ -227,8 +259,9 @@ export class MatchFormDialogComponent implements OnInit, OnDestroy {
       location: v.location,
       ageCategory: v.ageCategory,
       seasonId: v.seasonId,
-      groupId: v.groupId,
-      roundId: v.roundId || undefined,
+      groupId: isGroupStage(v.stage) ? v.groupId : undefined,
+      roundId: isGroupStage(v.stage) ? v.roundId || undefined : undefined,
+      stage: v.stage,
       refereesInfo: v.refereesInfo,
       status: v.status,
       scoreHome: v.scoreHome,

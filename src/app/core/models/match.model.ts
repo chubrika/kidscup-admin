@@ -1,5 +1,6 @@
 import { Category } from "./category.model";
 import { Team } from "./team.model";
+import type { MatchStage } from "./match-stage";
 
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled';
 
@@ -19,6 +20,7 @@ export interface Match {
   roundId?: string;
   group?: { _id: string; name?: string };
   round?: { _id: string; name?: string };
+  stage?: MatchStage;
   refereesInfo?: string;
   status: MatchStatus;
   scoreHome?: number;
@@ -37,6 +39,7 @@ export interface MatchCreateDto {
   seasonId?: string;
   groupId?: string;
   roundId?: string;
+  stage?: MatchStage;
   refereesInfo?: string;
   status: MatchStatus;
   scoreHome?: number;
