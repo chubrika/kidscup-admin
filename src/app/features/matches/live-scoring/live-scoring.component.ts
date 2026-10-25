@@ -58,8 +58,6 @@ export class LiveScoringComponent implements OnInit {
     const matchId = this.match?._id;
     if (!matchId) return;
 
-    this.liveMatchService.connectToMatch(matchId);
-
     forkJoin({
       stats: this.liveMatchService.getStats(matchId),
       timeline: this.liveMatchService.getTimeline(matchId, 30),
@@ -72,18 +70,6 @@ export class LiveScoringComponent implements OnInit {
         this.timeline.set(timeline);
         this.homePlayers.set(homePlayers as any);
         this.awayPlayers.set(awayPlayers as any);
-      });
-
-    this.liveMatchService
-      .onMatchUpdate()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ matchId: updatedMatchId, stats }) => {
-        if (updatedMatchId !== matchId) return;
-        this.stats.set(stats);
-        this.liveMatchService
-          .getTimeline(matchId, 30)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe((events) => this.timeline.set(events));
       });
   }
 
